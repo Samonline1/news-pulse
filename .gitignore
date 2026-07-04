@@ -1,0 +1,17 @@
+# Node.js
+node_modules/
+**/node_modules/
+
+# Next.js
+.next/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Environment files
+.env
+.env.*
+!.env.example
