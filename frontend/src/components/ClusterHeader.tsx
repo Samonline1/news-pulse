@@ -1,32 +1,15 @@
 import Link from "next/link";
 import type { ClusterSummary } from "@/types/cluster";
+import { formatDisplayDate } from "@/lib/formatDate";
 
 interface ClusterHeaderProps {
   cluster: ClusterSummary;
 }
 
-function formatDate(value?: string) {
-  if (!value) {
-    return "Unavailable";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Unavailable";
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
-}
-
 export function ClusterHeader({ cluster }: ClusterHeaderProps) {
   const timelineText =
     cluster.startTime || cluster.endTime
-      ? `${formatDate(cluster.startTime)} → ${formatDate(cluster.endTime)}`
+      ? `${formatDisplayDate(cluster.startTime)} → ${formatDisplayDate(cluster.endTime)}`
       : "Unavailable";
 
   return (
@@ -44,7 +27,7 @@ export function ClusterHeader({ cluster }: ClusterHeaderProps) {
 
           <Link
             href="/"
-            className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
           >
             Back
           </Link>

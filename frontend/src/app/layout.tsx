@@ -4,6 +4,9 @@ import { NewsDataProvider } from "@/components/NewsDataProvider";
 
 export const metadata: Metadata = {
   title: "News Pulse",
+  icons: {
+    icon: "/favicon.svg",
+  },
   description: "News Pulse dashboard",
 };
 

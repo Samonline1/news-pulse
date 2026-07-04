@@ -29,17 +29,47 @@ export function Timeline() {
                 <div className="flex justify-center">
                   <div className="mt-1.5 h-4 w-4 rounded-full bg-slate-200 sm:h-5 sm:w-5" />
                 </div>
-                <div className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft">
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-3 w-28 rounded-full bg-slate-200" />
+                    <div className="h-6 w-2/3 rounded-full bg-slate-200" />
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="h-16 rounded-xl bg-slate-100" />
+                      <div className="h-16 rounded-xl bg-slate-100" />
+                    </div>
+                    <div className="h-10 w-32 rounded-xl bg-slate-200" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         ) : timelineError ? (
-          <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-700">
-            {timelineError}
+          <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-6 text-rose-700">
+            <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:text-left">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100">
+                <span aria-hidden="true" className="text-lg">
+                  !
+                </span>
+              </div>
+              <div>
+                <p className="font-semibold">Could not load timeline</p>
+                <p className="mt-1 text-sm text-rose-600">{timelineError}</p>
+              </div>
+            </div>
           </div>
         ) : timeline.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center text-slate-500">
-            No timeline data available yet.
+            <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
+              <span className="text-3xl" aria-hidden="true">
+                ◎
+              </span>
+              <p className="text-base font-medium text-slate-700">
+                No timeline data available yet.
+              </p>
+              <p className="text-sm text-slate-500">
+                Refresh News to populate the timeline with new clusters.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="relative mt-8">

@@ -1,27 +1,10 @@
 import Link from "next/link";
 import type { ClusterSummary } from "@/types/cluster";
+import { formatDisplayDate } from "@/lib/formatDate";
 
 interface TimelineItemProps {
   cluster: ClusterSummary;
   isLast?: boolean;
-}
-
-function formatDate(value?: string) {
-  if (!value) {
-    return "Unavailable";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Unavailable";
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }
 
 export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
@@ -35,7 +18,7 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
       </div>
 
       <div className="pb-8 sm:pb-10">
-        <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-soft backdrop-blur sm:p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-soft transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg backdrop-blur sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -57,7 +40,7 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
                 Start Date
               </dt>
               <dd className="mt-1 font-medium text-slate-800">
-                {formatDate(cluster.startTime)}
+                {formatDisplayDate(cluster.startTime)}
               </dd>
             </div>
             <div className="rounded-xl bg-slate-50 px-4 py-3">
@@ -65,7 +48,7 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
                 End Date
               </dt>
               <dd className="mt-1 font-medium text-slate-800">
-                {formatDate(cluster.endTime)}
+                {formatDisplayDate(cluster.endTime)}
               </dd>
             </div>
           </dl>
@@ -73,7 +56,7 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
           <div className="mt-5 flex justify-start">
             <Link
               href={`/clusters/${cluster.clusterId}`}
-              className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
             >
               View Details
             </Link>
