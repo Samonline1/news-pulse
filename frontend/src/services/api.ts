@@ -25,4 +25,9 @@ export async function fetchClusterDetails(clusterId: string) {
   return response.data;
 }
 
+export async function triggerNewsRefresh() {
+  const response = await api.post("/ingest/trigger");
+  return response.data;
+}
+
 export default api;

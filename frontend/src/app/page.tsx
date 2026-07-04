@@ -1,50 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { ClusterCard } from "@/components/ClusterCard";
-import { fetchClusters } from "@/services/api";
-import type { ClusterSummary } from "@/types/cluster";
+import { useNewsData } from "@/components/NewsDataProvider";
 
 export default function HomePage() {
-  const [clusters, setClusters] = useState<ClusterSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadClusters() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetchClusters();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setClusters(response.data || []);
-      } catch (requestError) {
-        if (!isMounted) {
-          return;
-        }
-
-        setError("Failed to load clusters. Please try again.");
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadClusters();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { clusters, clustersLoading, clustersError } = useNewsData();
 
   return (
     <main className="min-h-screen">
@@ -65,7 +26,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          {loading ? (
+          {clustersLoading ? (
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
@@ -74,9 +35,9 @@ export default function HomePage() {
                 />
               ))}
             </div>
-          ) : error ? (
+          ) : clustersError ? (
             <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-700">
-              {error}
+              {clustersError}
             </div>
           ) : clusters.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center text-slate-500">

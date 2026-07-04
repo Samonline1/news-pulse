@@ -1,56 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchTimeline } from "@/services/api";
-import type { ClusterSummary } from "@/types/cluster";
 import { TimelineItem } from "@/components/TimelineItem";
+import { useNewsData } from "@/components/NewsDataProvider";
 
 export function Timeline() {
-const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadTimeline() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetchTimeline();
-
-        if (!isMounted) {
-          return;
-        }
-
-        const orderedTimeline = [...(response.data || [])].sort((a, b) => {
-          const aTime = new Date(a.startTime ?? 0).getTime();
-          const bTime = new Date(b.startTime ?? 0).getTime();
-
-          return aTime - bTime;
-        });
-
-        setTimeline(orderedTimeline);
-      } catch {
-        if (!isMounted) {
-          return;
-        }
-
-        setError("Failed to load the timeline. Please try again.");
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadTimeline();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { timeline, timelineLoading, timelineError } = useNewsData();
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -68,7 +22,7 @@ const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
           </p>
         </div>
 
-        {loading ? (
+        {timelineLoading ? (
           <div className="mt-8 space-y-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="grid grid-cols-[1.75rem_1fr] gap-4 sm:grid-cols-[2.5rem_minmax(0,1fr)]">
@@ -79,9 +33,9 @@ const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
               </div>
             ))}
           </div>
-        ) : error ? (
+        ) : timelineError ? (
           <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-700">
-            {error}
+            {timelineError}
           </div>
         ) : timeline.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center text-slate-500">

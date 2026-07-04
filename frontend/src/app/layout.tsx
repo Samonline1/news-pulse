@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { NewsDataProvider } from "@/components/NewsDataProvider";
 
 export const metadata: Metadata = {
   title: "News Pulse",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <NewsDataProvider>{children}</NewsDataProvider>
+      </body>
     </html>
   );
 }

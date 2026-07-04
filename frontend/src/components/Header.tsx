@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useNewsData } from "@/components/NewsDataProvider";
 
 export function Header() {
+  const { refreshNews, refreshing } = useNewsData();
+
   return (
     <header className="border-b border-slate-200/70 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
@@ -13,6 +18,21 @@ export function Header() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void refreshNews()}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {refreshing ? (
+              <>
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
+                Refreshing...
+              </>
+            ) : (
+              "Refresh News"
+            )}
+          </button>
           <Link
             href="/"
             className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
