@@ -6,18 +6,26 @@ from typing import Any
 from database.mongo import get_database
 
 
-def save_articles(articles: list[dict[str, Any]]) -> int:
+def save_articles(articles: list[dict[str, Any]]) -> tuple[int, int]:
     if not articles:
-        return 0
+        return 0, 0
 
     database = get_database()
     collection = database["articles"]
 
-    documents = []
-    for article in articles:
-        document = dict(article)
-        document["createdAt"] = datetime.now(timezone.utc)
-        documents.append(document)
+    inserted_count = 0
+    skipped_count = 0
 
-    result = collection.insert_many(documents)
-    return len(result.inserted_ids)
+    for article in articles:
+        url = str(article.get("link", "")).strip()
+        if url and collection.find_one({"link": url}, {"_id": 1}) is not None:
+            skipped_count += 1
+            continue
+
+        document = dict(article)
+        document["link"] = url
+        document["createdAt"] = datetime.now(timezone.utc)
+        collection.insert_one(document)
+        inserted_count += 1
+
+    return inserted_count, skipped_count

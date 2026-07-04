@@ -10,10 +10,10 @@ def main() -> None:
     articles = get_articles()
     print(f"Total articles: {len(articles)}")
     extracted_articles = [extract_article_content(article) for article in articles[:3]]
-    inserted_count = save_articles(extracted_articles)
-    print(f"Inserted {inserted_count} articles into MongoDB")
+    inserted_count, skipped_count = save_articles(extracted_articles)
+    print(f"Inserted: {inserted_count} articles")
+    print(f"Skipped: {skipped_count} duplicate articles")
 
 
 if __name__ == "__main__":
     main()
-
