@@ -136,6 +136,9 @@ STOP_WORDS = {
 }
 
 WORD_RE = re.compile(r"[a-z0-9]+")
+MIN_LABEL_WORD_LENGTH = 3
+MAX_LABEL_WORDS = 4
+MIN_LABEL_WORDS = 2
 
 
 @dataclass(frozen=True, slots=True)
@@ -160,6 +163,18 @@ def _build_keywords(article: dict[str, Any]) -> set[str]:
     return {token for token in tokens if token not in STOP_WORDS}
 
 
+def _extract_label_words(text: str) -> list[str]:
+    tokens = WORD_RE.findall(text.lower())
+    return [
+        token
+        for token in tokens
+        if len(token) >= MIN_LABEL_WORD_LENGTH
+        and token not in STOP_WORDS
+        and not token.isdigit()
+        and len(set(token)) > 1
+    ]
+
+
 def _parse_datetime(value: Any) -> datetime | None:
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
@@ -180,14 +195,73 @@ def _format_label(keyword_counts: Counter[str]) -> str:
     for keyword, _ in keyword_counts.most_common():
         if keyword not in selected_keywords:
             selected_keywords.append(keyword)
-        if len(selected_keywords) == 3:
+        if len(selected_keywords) == MAX_LABEL_WORDS:
             break
 
-    return " ".join(word.capitalize() for word in selected_keywords) if selected_keywords else "General"
+    if len(selected_keywords) < MIN_LABEL_WORDS:
+        return "General"
+
+    return " ".join(word.capitalize() for word in selected_keywords[:MAX_LABEL_WORDS])
 
 
-def _format_cluster_date(value: datetime | None) -> datetime | None:
-    return value
+def _build_cluster_label(group_articles: list[dict[str, Any]]) -> str:
+    title_counts: Counter[str] = Counter()
+    overall_counts: Counter[str] = Counter()
+    first_seen: dict[str, int] = {}
+
+    for position, item in enumerate(group_articles):
+        article = item["article"]
+        title_words = _extract_label_words(str(article.get("title", "")))
+        summary_words = _extract_label_words(str(article.get("summary", "")))
+
+        for word in title_words:
+            title_counts[word] += 2
+            overall_counts[word] += 2
+            first_seen.setdefault(word, position)
+
+        for word in summary_words:
+            overall_counts[word] += 1
+            first_seen.setdefault(word, position)
+
+    if not overall_counts:
+        return "General"
+
+    ranked_words = sorted(
+        overall_counts.items(),
+        key=lambda item: (
+            -item[1],
+            -title_counts.get(item[0], 0),
+            first_seen.get(item[0], 0),
+            item[0],
+        ),
+    )
+
+    selected_words: list[str] = []
+    for word, _ in ranked_words:
+        if word in selected_words:
+            continue
+        selected_words.append(word)
+        if len(selected_words) == MAX_LABEL_WORDS:
+            break
+
+    if len(selected_words) < MIN_LABEL_WORDS:
+        return "General"
+
+    return " ".join(word.title() for word in selected_words)
+
+
+def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[datetime | None, datetime | None]:
+    published_times: list[datetime] = []
+
+    for item in group_articles:
+        published_at = _parse_datetime(item["article"].get("published"))
+        if published_at is not None:
+            published_times.append(published_at)
+
+    if not published_times:
+        return None, None
+
+    return min(published_times), max(published_times)
 
 
 def cluster_articles() -> ClusterRunResult:
@@ -255,8 +329,6 @@ def cluster_articles() -> ClusterRunResult:
         all_keywords = Counter()
         article_ids = []
         sources: list[str] = []
-        start_times: list[datetime] = []
-        end_times: list[datetime] = []
 
         for item in group_articles:
             article = item["article"]
@@ -267,15 +339,9 @@ def cluster_articles() -> ClusterRunResult:
             if source and source not in sources:
                 sources.append(source)
 
-            published_at = _parse_datetime(article.get("published"))
-            if published_at is not None:
-                start_times.append(published_at)
-                end_times.append(published_at)
-
-        label = _format_label(all_keywords)
+        label = _build_cluster_label(group_articles)
         keywords = [keyword for keyword, _ in all_keywords.most_common()]
-        start_time = min(start_times) if start_times else None
-        end_time = max(end_times) if end_times else None
+        start_time, end_time = _collect_cluster_time_bounds(group_articles)
 
         cluster_documents.append(
             {
@@ -286,8 +352,8 @@ def cluster_articles() -> ClusterRunResult:
                 "articleCount": len(article_ids),
                 "articleIds": article_ids,
                 "sources": sources,
-                "startTime": _format_cluster_date(start_time),
-                "endTime": _format_cluster_date(end_time),
+                "startTime": start_time,
+                "endTime": end_time,
                 "createdAt": datetime.now(timezone.utc),
             }
         )

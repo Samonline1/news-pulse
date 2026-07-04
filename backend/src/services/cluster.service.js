@@ -1,6 +1,23 @@
 const Cluster = require("../models/Cluster");
 const Article = require("../models/Article");
 
+function toPublicCluster(cluster) {
+  if (!cluster) {
+    return cluster;
+  }
+
+  const {
+    _id,
+    __v,
+    keywords,
+    articleIds,
+    createdAt,
+    ...publicCluster
+  } = cluster;
+
+  return publicCluster;
+}
+
 async function getAllClusters() {
   const clusters = await Cluster.find(
     {},
@@ -11,12 +28,14 @@ async function getAllClusters() {
       sources: 1,
       startTime: 1,
       endTime: 1,
+      _id: 0,
+      __v: 0,
     }
   )
     .sort({ startTime: -1 })
     .lean();
 
-  return clusters;
+  return clusters.map(toPublicCluster);
 }
 
 async function getTimeline() {
@@ -28,12 +47,14 @@ async function getTimeline() {
       articleCount: 1,
       startTime: 1,
       endTime: 1,
+      _id: 0,
+      __v: 0,
     }
   )
     .sort({ startTime: 1 })
     .lean();
 
-  return clusters;
+  return clusters.map(toPublicCluster);
 }
 
 async function getClusterDetails(clusterId) {
@@ -46,6 +67,8 @@ async function getClusterDetails(clusterId) {
       sources: 1,
       startTime: 1,
       endTime: 1,
+      _id: 0,
+      __v: 0,
     }
   ).lean();
 
@@ -67,7 +90,7 @@ async function getClusterDetails(clusterId) {
     .lean();
 
   return {
-    cluster,
+    cluster: toPublicCluster(cluster),
     articles,
   };
 }
