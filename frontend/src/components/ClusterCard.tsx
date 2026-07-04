@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ClusterSummary } from "@/types/cluster";
 
 interface ClusterCardProps {
@@ -17,12 +18,12 @@ export function ClusterCard({ cluster }: ClusterCardProps) {
         </div>
       </div>
 
-      <button
-        type="button"
+      <Link
+        href={`/clusters/${cluster.clusterId}`}
         className="mt-6 inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
       >
         View Details
-      </button>
+      </Link>
     </article>
   );
 }

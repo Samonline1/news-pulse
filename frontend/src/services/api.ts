@@ -1,5 +1,9 @@
 import axios from "axios";
-import type { ClustersResponse, TimelineResponse } from "@/types/cluster";
+import type {
+  ClusterDetails,
+  ClustersResponse,
+  TimelineResponse,
+} from "@/types/cluster";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
@@ -13,6 +17,11 @@ export async function fetchClusters() {
 
 export async function fetchTimeline() {
   const response = await api.get<TimelineResponse>("/timeline");
+  return response.data;
+}
+
+export async function fetchClusterDetails(clusterId: string) {
+  const response = await api.get<ClusterDetails>(`/clusters/${clusterId}`);
   return response.data;
 }
 

@@ -16,3 +16,16 @@ export interface TimelineResponse {
   data: ClusterSummary[];
   message?: string;
 }
+
+export interface ArticleDetails {
+  title: string;
+  summary: string;
+  source: string;
+  published: string;
+  link: string;
+}
+
+export interface ClusterDetails {
+  cluster: ClusterSummary;
+  articles: ArticleDetails[];
+}
