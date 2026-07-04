@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Header() {
   return (
     <header className="border-b border-slate-200/70 bg-white/80 backdrop-blur">
@@ -10,8 +12,19 @@ export function Header() {
             Cluster Dashboard
           </h1>
         </div>
-        <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600">
-          Live News Intelligence
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/timeline"
+            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          >
+            Timeline
+          </Link>
         </div>
       </div>
     </header>

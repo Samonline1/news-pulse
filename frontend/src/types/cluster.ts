@@ -11,3 +11,8 @@ export interface ClustersResponse {
   data: ClusterSummary[];
   message?: string;
 }
+
+export interface TimelineResponse {
+  data: ClusterSummary[];
+  message?: string;
+}
