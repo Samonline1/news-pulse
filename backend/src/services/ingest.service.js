@@ -1,105 +1,91 @@
-const { execFile } = require("child_process");
+const { spawn } = require("child_process");
 const path = require("path");
 
+let activeIngestionProcess = null;
+
 function resolvePythonExecutable() {
-  return process.env.PYTHON_EXECUTABLE || process.env.PYTHON_BIN || "python";
+  if (process.platform === "win32") {
+    return "python";
+  }
+
+  return "python3";
 }
 
 function resolveScraperScriptPath() {
   return path.resolve(__dirname, "..", "..", "..", "scraper", "main.py");
 }
 
-function parseSummary(stdout) {
-  const summary = {
-    totalArticles: 0,
-    inserted: 0,
-    skipped: 0,
-    clusters: 0,
-  };
+function logIngestionCompletion(exitCode, stdout, stderr) {
+  const success = exitCode === 0;
+  const statusLabel = success ? "success" : "failure";
 
-  if (!stdout) {
-    return summary;
+  console.log(
+    `[ingest] scraper ${statusLabel} | exitCode=${exitCode === null ? "null" : exitCode}`
+  );
+
+  if (stdout) {
+    console.log("[ingest] scraper stdout:\n" + stdout.trimEnd());
   }
 
-  const totalMatch = stdout.match(/Total Articles\s*:\s*(\d+)/i);
-  const insertedMatch = stdout.match(/Inserted\s*:\s*(\d+)/i);
-  const skippedMatch = stdout.match(/Skipped\s*:\s*(\d+)/i);
-  const clustersMatch = stdout.match(/Clusters\s*:\s*(\d+)/i);
-
-  if (totalMatch) {
-    summary.totalArticles = Number(totalMatch[1]);
+  if (stderr) {
+    console.error("[ingest] scraper stderr:\n" + stderr.trimEnd());
   }
+}
 
-  if (insertedMatch) {
-    summary.inserted = Number(insertedMatch[1]);
+function clearActiveIngestionProcess(childProcess) {
+  if (activeIngestionProcess === childProcess) {
+    activeIngestionProcess = null;
   }
-
-  if (skippedMatch) {
-    summary.skipped = Number(skippedMatch[1]);
-  }
-
-  if (clustersMatch) {
-    summary.clusters = Number(clustersMatch[1]);
-  }
-
-  return summary;
 }
 
 function triggerIngestion() {
-  return new Promise((resolve, reject) => {
-    const pythonExecutable = resolvePythonExecutable();
-    const scriptPath = resolveScraperScriptPath();
+  if (activeIngestionProcess) {
+    return {
+      started: false,
+      reason: "already_running",
+    };
+  }
 
-    const childProcess = execFile(pythonExecutable, [scriptPath], {
-      windowsHide: true,
-      timeout: 0,
-      maxBuffer: 10 * 1024 * 1024,
-    });
+  const pythonExecutable = resolvePythonExecutable();
+  const scriptPath = resolveScraperScriptPath();
 
-    let stdout = "";
-    let stderr = "";
-
-    childProcess.stdout.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-
-    childProcess.stderr.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
-
-    childProcess.on("error", (error) => {
-      reject({
-        type: "spawn_error",
-        message: error.message,
-        stderr: stderr || error.message,
-      });
-    });
-
-    childProcess.on("close", (code) => {
-      if (code === 0) {
-        resolve({
-          exitCode: code,
-          stdout,
-          stderr,
-          summary: parseSummary(stdout),
-        });
-        return;
-      }
-
-      reject({
-        type: "process_error",
-        exitCode: code,
-        stdout,
-        stderr: stderr || `Scraper exited with code ${code}`,
-        summary: parseSummary(stdout),
-      });
-    });
+  const childProcess = spawn(pythonExecutable, [scriptPath], {
+    windowsHide: true,
+    stdio: ["ignore", "pipe", "pipe"],
   });
+
+  activeIngestionProcess = childProcess;
+
+  let stdout = "";
+  let stderr = "";
+
+  childProcess.stdout.on("data", (chunk) => {
+    stdout += chunk.toString();
+  });
+
+  childProcess.stderr.on("data", (chunk) => {
+    stderr += chunk.toString();
+  });
+
+  childProcess.on("error", (error) => {
+    console.error(`[ingest] scraper failed to start: ${error.message}`);
+    clearActiveIngestionProcess(childProcess);
+  });
+
+  childProcess.on("close", (code, signal) => {
+    const exitCode = typeof code === "number" ? code : signal ? 1 : null;
+    logIngestionCompletion(exitCode, stdout, stderr);
+    clearActiveIngestionProcess(childProcess);
+  });
+
+  return {
+    started: true,
+    processId: childProcess.pid,
+  };
 }
 
 module.exports = {
   triggerIngestion,
   resolvePythonExecutable,
   resolveScraperScriptPath,
-  parseSummary,
 };

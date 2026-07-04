@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
+import axios from "axios";
 import { fetchClusters, fetchTimeline, triggerNewsRefresh } from "@/services/api";
 import type { ClusterSummary } from "@/types/cluster";
 
@@ -39,6 +40,24 @@ function sortByStartTime(items: ClusterSummary[]) {
     const aTime = new Date(a.startTime ?? 0).getTime();
     const bTime = new Date(b.startTime ?? 0).getTime();
     return aTime - bTime;
+  });
+}
+
+function getClusterSnapshot(clusters: ClusterSummary[]) {
+  const latestTimestamp = clusters.reduce((latest, cluster) => {
+    const candidate = Math.max(
+      new Date(cluster.endTime ?? 0).getTime(),
+      new Date(cluster.startTime ?? 0).getTime()
+    );
+    return Math.max(latest, candidate);
+  }, 0);
+
+  return `${clusters.length}:${latestTimestamp}`;
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
   });
 }
 
@@ -100,15 +119,56 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
     setRefreshing(true);
 
     try {
-      await triggerNewsRefresh();
-      await Promise.all([loadClusters(), loadTimeline()]);
-      showToast("News updated successfully.", "success");
-    } catch {
-      showToast("Failed to refresh news. Please try again.", "error");
+      const baselineSnapshot = getClusterSnapshot(clusters);
+      const response = await triggerNewsRefresh();
+      showToast(response.message || "News ingestion started.", "success");
+
+      const timeoutAt = Date.now() + 60_000;
+      let hasChanged = false;
+
+      while (Date.now() < timeoutAt) {
+        await sleep(5_000);
+
+        try {
+          const latest = await fetchClusters();
+          const nextSnapshot = getClusterSnapshot(latest.data || []);
+
+          if (nextSnapshot !== baselineSnapshot) {
+            hasChanged = true;
+            await Promise.all([loadClusters(), loadTimeline()]);
+            window.dispatchEvent(new Event("news-data-refresh"));
+            showToast("News updated successfully.", "success");
+            break;
+          }
+        } catch (pollError) {
+          console.error("Polling clusters failed:", pollError);
+        }
+      }
+
+      if (!hasChanged) {
+        window.dispatchEvent(new Event("news-data-refresh"));
+      }
+    } catch (requestError) {
+      const fallbackMessage = "Failed to refresh news. Please try again.";
+      let message = fallbackMessage;
+
+      if (axios.isAxiosError(requestError)) {
+        const responseMessage =
+          (requestError.response?.data as { message?: string; details?: string } | undefined)
+            ?.details ||
+          (requestError.response?.data as { message?: string } | undefined)?.message;
+
+        if (responseMessage) {
+          message = responseMessage;
+        }
+      }
+
+      console.error("Refresh News failed:", requestError);
+      showToast(message, "error");
     } finally {
       setRefreshing(false);
     }
-  }, [loadClusters, loadTimeline, refreshing, showToast]);
+  }, [clusters, loadClusters, loadTimeline, refreshing, showToast]);
 
   const value = useMemo<NewsDataContextValue>(
     () => ({

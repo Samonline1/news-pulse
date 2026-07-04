@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ClusterHeader } from "@/components/ClusterHeader";
@@ -17,46 +17,41 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const loadCluster = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setNotFound(false);
 
-    async function loadCluster() {
-      try {
-        setLoading(true);
-        setError(null);
-        setNotFound(false);
-
-        const response = await fetchClusterDetails(clusterId);
-
-        if (!isMounted) {
-          return;
-        }
-
-        setData(response);
-      } catch (requestError) {
-        if (!isMounted) {
-          return;
-        }
-
-        if (axios.isAxiosError(requestError) && requestError.response?.status === 404) {
-          setNotFound(true);
-          setData(null);
-        } else {
-          setError("Failed to load cluster details. Please try again.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+      const response = await fetchClusterDetails(clusterId);
+      setData(response.data);
+    } catch (requestError) {
+      if (axios.isAxiosError(requestError) && requestError.response?.status === 404) {
+        setNotFound(true);
+        setData(null);
+      } else {
+        setError("Failed to load cluster details. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
+  }, [clusterId]);
 
-    loadCluster();
+  useEffect(() => {
+    void loadCluster();
+  }, [loadCluster]);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      void loadCluster();
+    };
+
+    window.addEventListener("news-data-refresh", handleRefresh);
 
     return () => {
-      isMounted = false;
+      window.removeEventListener("news-data-refresh", handleRefresh);
     };
-  }, [clusterId]);
+  }, [loadCluster]);
 
   return (
     <main className="min-h-screen">

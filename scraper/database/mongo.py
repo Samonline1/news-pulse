@@ -9,9 +9,9 @@ from config import settings
 
 @lru_cache(maxsize=1)
 def get_mongo_client() -> MongoClient:
-    if not settings.mongodb_uri:
-        raise ValueError("MONGODB_URI is not configured")
-    return MongoClient(settings.mongodb_uri)
+    if not settings.mongo_uri:
+        raise ValueError("MONGO_URI is not configured")
+    return MongoClient(settings.mongo_uri)
 
 
 def get_database():

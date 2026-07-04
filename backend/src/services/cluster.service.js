@@ -8,7 +8,6 @@ function toPublicCluster(cluster) {
 
   const {
     _id,
-    __v,
     keywords,
     articleIds,
     createdAt,
@@ -29,7 +28,6 @@ async function getAllClusters() {
       startTime: 1,
       endTime: 1,
       _id: 0,
-      __v: 0,
     }
   )
     .sort({ startTime: -1 })
@@ -48,7 +46,6 @@ async function getTimeline() {
       startTime: 1,
       endTime: 1,
       _id: 0,
-      __v: 0,
     }
   )
     .sort({ startTime: 1 })
@@ -68,7 +65,6 @@ async function getClusterDetails(clusterId) {
       startTime: 1,
       endTime: 1,
       _id: 0,
-      __v: 0,
     }
   ).lean();
 
@@ -79,6 +75,7 @@ async function getClusterDetails(clusterId) {
   const articles = await Article.find(
     { clusterId },
     {
+      _id: 0,
       title: 1,
       summary: 1,
       source: 1,

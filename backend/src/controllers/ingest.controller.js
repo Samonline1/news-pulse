@@ -1,33 +1,20 @@
 const ingestService = require("../services/ingest.service");
+const { errorResponse, successResponse } = require("../utils/apiResponse");
 
 async function triggerIngestion(req, res, next) {
   try {
-    const result = await ingestService.triggerIngestion();
+    const result = ingestService.triggerIngestion();
 
-    if (result.stdout) {
-      console.log(result.stdout);
+    if (!result.started) {
+      return res.status(409).json(
+        errorResponse("Ingestion already in progress.")
+      );
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Ingestion completed successfully",
-      summary: result.summary,
-    });
+    return res
+      .status(202)
+      .json(successResponse(null, "News ingestion started."));
   } catch (error) {
-    if (error && error.type) {
-      if (error.stdout) {
-        console.log(error.stdout);
-      }
-      if (error.stderr) {
-        console.error(error.stderr);
-      }
-
-      return res.status(500).json({
-        message: "Ingestion failed",
-        error: error.stderr || error.message || "Unknown error",
-      });
-    }
-
     return next(error);
   }
 }

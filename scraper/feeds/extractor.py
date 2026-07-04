@@ -16,7 +16,7 @@ def extract_article_content(article: dict[str, Any]) -> dict[str, Any]:
         return updated_article
 
     try:
-        response = requests.get(url, timeout=15)
+        response = requests.get(url)
         response.raise_for_status()
         downloaded_html = response.text
         extracted_content = trafilatura.extract(downloaded_html, include_comments=False, include_tables=False)

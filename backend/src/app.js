@@ -5,6 +5,7 @@ const clusterRoutes = require("./routes/cluster.routes");
 const ingestRoutes = require("./routes/ingest.routes");
 const healthRoutes = require("./routes/healthRoutes");
 const timelineRoutes = require("./routes/timeline.routes");
+const { errorResponse } = require("./utils/apiResponse");
 
 function createApp() {
   const app = express();
@@ -19,10 +20,7 @@ function createApp() {
 
   app.use((error, req, res, next) => {
     console.error("Unhandled error:", error);
-    return res.status(500).json({
-      status: "error",
-      message: "Internal server error",
-    });
+    return res.status(500).json(errorResponse("Internal server error"));
   });
 
   return app;

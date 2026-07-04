@@ -1,19 +1,11 @@
 const clusterService = require("../services/cluster.service");
+const { successResponse } = require("../utils/apiResponse");
 
 async function getTimeline(req, res, next) {
   try {
     const timeline = await clusterService.getTimeline();
 
-    if (!timeline.length) {
-      return res.status(200).json({
-        message: "No timeline data",
-        data: [],
-      });
-    }
-
-    return res.status(200).json({
-      data: timeline,
-    });
+    return res.status(200).json(successResponse(timeline, timeline.length ? undefined : "No timeline data"));
   } catch (error) {
     return next(error);
   }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from email.utils import parsedate_to_datetime
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -182,9 +183,11 @@ def _parse_datetime(value: Any) -> datetime | None:
         return None
     if isinstance(value, str):
         try:
-            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            parsed = parsedate_to_datetime(value)
+            if parsed is None:
+                parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
             return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
-        except ValueError:
+        except (TypeError, ValueError):
             return None
     return None
 

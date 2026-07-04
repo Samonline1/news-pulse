@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 import feedparser
+from config import settings
 
 
-RSS_FEEDS: tuple[tuple[str, str], ...] = (
+DEFAULT_RSS_FEEDS: tuple[tuple[str, str], ...] = (
     ("BBC", "https://feeds.bbci.co.uk/news/rss.xml"),
     ("NPR", "https://feeds.npr.org/1001/rss.xml"),
     ("Reuters", "https://feeds.reuters.com/reuters/topNews"),
@@ -50,6 +51,14 @@ def _parse_feed(source: str, url: str) -> list[dict[str, str]]:
 
 def get_articles() -> list[dict[str, str]]:
     articles: list[dict[str, str]] = []
-    for source, url in RSS_FEEDS:
+    configured_feeds = settings.rss_feeds or [
+        {"source": source, "url": url} for source, url in DEFAULT_RSS_FEEDS
+    ]
+
+    for feed in configured_feeds:
+        source = str(feed.get("source", "")).strip()
+        url = str(feed.get("url", "")).strip()
+        if not source or not url:
+            continue
         articles.extend(_parse_feed(source, url))
     return articles

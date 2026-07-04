@@ -1,33 +1,41 @@
 import axios from "axios";
-import type {
-  ClusterDetails,
-  ClustersResponse,
-  TimelineResponse,
-} from "@/types/cluster";
+import type { ClusterDetails, ClusterSummary } from "@/types/cluster";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 15000,
 });
 
-export async function fetchClusters() {
-  const response = await api.get<ClustersResponse>("/clusters");
+const refreshApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  timeout: 180000,
+});
+
+type ApiEnvelope<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+async function unwrapResponse<T>(request: Promise<{ data: ApiEnvelope<T> }>) {
+  const response = await request;
   return response.data;
+}
+
+export async function fetchClusters() {
+  return unwrapResponse<ClusterSummary[]>(api.get("/clusters"));
 }
 
 export async function fetchTimeline() {
-  const response = await api.get<TimelineResponse>("/timeline");
-  return response.data;
+  return unwrapResponse<ClusterSummary[]>(api.get("/timeline"));
 }
 
 export async function fetchClusterDetails(clusterId: string) {
-  const response = await api.get<ClusterDetails>(`/clusters/${clusterId}`);
-  return response.data;
+  return unwrapResponse<ClusterDetails>(api.get(`/clusters/${clusterId}`));
 }
 
 export async function triggerNewsRefresh() {
-  const response = await api.post("/ingest/trigger");
-  return response.data;
+  return unwrapResponse<null>(refreshApi.post("/ingest/trigger"));
 }
 
 export default api;
