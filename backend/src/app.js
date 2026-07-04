@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const clusterRoutes = require("./routes/cluster.routes");
 const healthRoutes = require("./routes/healthRoutes");
+const timelineRoutes = require("./routes/timeline.routes");
 
 function createApp() {
   const app = express();
@@ -12,6 +13,7 @@ function createApp() {
 
   app.use("/", healthRoutes);
   app.use("/api/clusters", clusterRoutes);
+  app.use("/api/timeline", timelineRoutes);
 
   app.use((error, req, res, next) => {
     console.error("Unhandled error:", error);

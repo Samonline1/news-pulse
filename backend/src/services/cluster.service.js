@@ -19,6 +19,23 @@ async function getAllClusters() {
   return clusters;
 }
 
+async function getTimeline() {
+  const clusters = await Cluster.find(
+    {},
+    {
+      clusterId: 1,
+      label: 1,
+      articleCount: 1,
+      startTime: 1,
+      endTime: 1,
+    }
+  )
+    .sort({ startTime: 1 })
+    .lean();
+
+  return clusters;
+}
+
 async function getClusterDetails(clusterId) {
   const cluster = await Cluster.findOne(
     { clusterId },
@@ -57,5 +74,6 @@ async function getClusterDetails(clusterId) {
 
 module.exports = {
   getAllClusters,
+  getTimeline,
   getClusterDetails,
 };
