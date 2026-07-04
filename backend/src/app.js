@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const clusterRoutes = require("./routes/cluster.routes");
+const ingestRoutes = require("./routes/ingest.routes");
 const healthRoutes = require("./routes/healthRoutes");
 const timelineRoutes = require("./routes/timeline.routes");
 
@@ -12,6 +13,7 @@ function createApp() {
   app.use(express.json());
 
   app.use("/", healthRoutes);
+  app.use("/api/ingest", ingestRoutes);
   app.use("/api/clusters", clusterRoutes);
   app.use("/api/timeline", timelineRoutes);
 
