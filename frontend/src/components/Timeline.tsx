@@ -4,8 +4,10 @@ import { useMemo } from "react";
 import { TimelineItem } from "@/components/TimelineItem";
 import { useNewsData } from "@/components/NewsDataProvider";
 
+// Timeline
 export function Timeline() {
   const { timeline, timelineLoading, timelineError } = useNewsData();
+  // Sort
   const sortedTimeline = useMemo(() => {
     return [...timeline].sort((a, b) => {
       const aTime = new Date(a.endTime ?? a.startTime ?? 0).getTime();

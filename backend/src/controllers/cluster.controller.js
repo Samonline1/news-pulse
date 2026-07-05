@@ -1,6 +1,7 @@
 const clusterService = require("../services/cluster.service");
 const { errorResponse, successResponse } = require("../utils/apiResponse");
 
+// List view
 async function getClusters(req, res, next) {
   try {
     const clusters = await clusterService.getAllClusters();
@@ -11,6 +12,7 @@ async function getClusters(req, res, next) {
   }
 }
 
+// Detail view
 async function getClusterById(req, res, next) {
   try {
     const { clusterId } = req.params;

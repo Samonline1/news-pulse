@@ -5,6 +5,7 @@ interface ClusterCardProps {
   cluster: ClusterSummary;
 }
 
+// Card
 export function ClusterCard({ cluster }: ClusterCardProps) {
   return (
     <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg">

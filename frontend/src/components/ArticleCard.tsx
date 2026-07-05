@@ -6,6 +6,7 @@ interface ArticleCardProps {
   article: ArticleDetails;
 }
 
+// Article
 export function ArticleCard({ article }: ArticleCardProps) {
   const hasLink = Boolean(article.link);
 

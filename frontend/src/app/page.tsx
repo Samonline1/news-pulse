@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { ClusterCard } from "@/components/ClusterCard";
 import { useNewsData } from "@/components/NewsDataProvider";
 
+// Dashboard
 export default function HomePage() {
   const { clusters, clustersLoading, clustersError } = useNewsData();
 

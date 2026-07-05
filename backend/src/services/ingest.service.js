@@ -1,8 +1,10 @@
 const { spawn } = require("child_process");
 const path = require("path");
 
+// Process guard
 let activeIngestionProcess = null;
 
+// Python path
 function resolvePythonExecutable() {
   if (process.platform === "win32") {
     return "python";
@@ -11,10 +13,12 @@ function resolvePythonExecutable() {
   return "python3";
 }
 
+// Script path
 function resolveScraperScriptPath() {
   return path.resolve(__dirname, "..", "..", "..", "scraper", "main.py");
 }
 
+// Logging
 function logIngestionCompletion(exitCode, stdout, stderr) {
   const success = exitCode === 0;
   const statusLabel = success ? "success" : "failure";
@@ -32,12 +36,14 @@ function logIngestionCompletion(exitCode, stdout, stderr) {
   }
 }
 
+// Reset state
 function clearActiveIngestionProcess(childProcess) {
   if (activeIngestionProcess === childProcess) {
     activeIngestionProcess = null;
   }
 }
 
+// Spawn run
 function triggerIngestion() {
   if (activeIngestionProcess) {
     return {

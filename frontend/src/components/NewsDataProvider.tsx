@@ -35,6 +35,7 @@ interface NewsDataContextValue {
 
 const NewsDataContext = createContext<NewsDataContextValue | null>(null);
 
+// Snapshot
 function getClusterSnapshot(clusters: ClusterSummary[]) {
   const latestTimestamp = clusters.reduce((latest, cluster) => {
     const candidate = Math.max(
@@ -47,12 +48,14 @@ function getClusterSnapshot(clusters: ClusterSummary[]) {
   return `${clusters.length}:${latestTimestamp}`;
 }
 
+// Delay
 function sleep(ms: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
 }
 
+// Provider
 export function NewsDataProvider({ children }: { children: ReactNode }) {
   const [clusters, setClusters] = useState<ClusterSummary[]>([]);
   const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
@@ -63,6 +66,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
   const [refreshing, setRefreshing] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
 
+  // Toast
   const showToast = useCallback((message: string, type: ToastType) => {
     const id = Date.now();
     setToast({ id, message, type });
@@ -72,6 +76,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
     }, 3000);
   }, []);
 
+  // Clusters
   const loadClusters = useCallback(async () => {
     try {
       setClustersLoading(true);
@@ -85,6 +90,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Timeline
   const loadTimeline = useCallback(async () => {
     try {
       setTimelineLoading(true);
@@ -103,6 +109,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
     void loadTimeline();
   }, [loadClusters, loadTimeline]);
 
+  // Refresh
   const refreshNews = useCallback(async () => {
     if (refreshing) {
       return;
@@ -162,6 +169,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
     }
   }, [clusters, loadClusters, loadTimeline, refreshing, showToast]);
 
+  // Context
   const value = useMemo<NewsDataContextValue>(
     () => ({
       clusters,
@@ -195,6 +203,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook
 export function useNewsData() {
   const context = useContext(NewsDataContext);
 
@@ -205,6 +214,7 @@ export function useNewsData() {
   return context;
 }
 
+// Toast UI
 function ToastBanner({ toast }: { toast: ToastState }) {
   const isSuccess = toast.type === "success";
 

@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# Settings
 @dataclass(frozen=True, slots=True)
 class Settings:
     mongo_uri: str | None = None
@@ -17,6 +18,7 @@ class Settings:
     rss_feeds: list[dict[str, str]] = field(default_factory=list)
 
 
+# Parse
 def _parse_rss_feeds(raw_value: str | None) -> list[dict[str, str]]:
     if not raw_value:
         return []
@@ -57,6 +59,7 @@ def _parse_rss_feeds(raw_value: str | None) -> list[dict[str, str]]:
     return feeds
 
 
+# Config
 settings = Settings(
     mongo_uri=os.getenv("MONGO_URI") or os.getenv("MONGODB_URI") or None,
     environment=os.getenv("ENVIRONMENT", "development"),

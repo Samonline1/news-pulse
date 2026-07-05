@@ -3,10 +3,12 @@ require("dotenv").config();
 const createApp = require("./app");
 const { connectDB } = require("./config/db");
 
+// Startup
 const PORT = Number(process.env.PORT || 5000);
 const MONGODB_URI = process.env.MONGODB_URI;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
+// Boot
 async function startServer() {
   const app = createApp();
   try {

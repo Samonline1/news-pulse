@@ -3,6 +3,7 @@ const { getClusterById, getClusters } = require("../controllers/cluster.controll
 
 const router = express.Router();
 
+// Cluster routes
 router.get("/", getClusters);
 router.get("/:clusterId", getClusterById);
 

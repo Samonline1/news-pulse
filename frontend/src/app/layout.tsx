@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { NewsDataProvider } from "@/components/NewsDataProvider";
 
+// Metadata
 export const metadata: Metadata = {
   title: "News Pulse",
   icons: {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   description: "News Pulse dashboard",
 };
 
+// Shell
 export default function RootLayout({
   children,
 }: Readonly<{

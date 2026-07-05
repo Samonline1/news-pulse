@@ -1,3 +1,4 @@
+// Success
 function successResponse(data, message) {
   const response = {
     success: true,
@@ -11,6 +12,7 @@ function successResponse(data, message) {
   return response;
 }
 
+// Failure
 function errorResponse(message, details) {
   const response = {
     success: false,

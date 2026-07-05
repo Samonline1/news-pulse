@@ -1,6 +1,7 @@
 const Cluster = require("../models/Cluster");
 const Article = require("../models/Article");
 
+// Public view
 function toPublicCluster(cluster) {
   if (!cluster) {
     return cluster;
@@ -17,6 +18,7 @@ function toPublicCluster(cluster) {
   return publicCluster;
 }
 
+// Cluster list
 async function getAllClusters() {
   const clusters = await Cluster.find(
     {},
@@ -36,6 +38,7 @@ async function getAllClusters() {
   return clusters.map(toPublicCluster);
 }
 
+// Timeline list
 async function getTimeline() {
   const clusters = await Cluster.find(
     {},
@@ -54,6 +57,7 @@ async function getTimeline() {
   return clusters.map(toPublicCluster);
 }
 
+// Cluster detail
 async function getClusterDetails(clusterId) {
   const cluster = await Cluster.findOne(
     { clusterId },

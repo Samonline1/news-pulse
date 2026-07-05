@@ -11,12 +11,14 @@ interface ClusterDetailsPageProps {
   clusterId: string;
 }
 
+// Details
 export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
   const [data, setData] = useState<ClusterDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
 
+  // Load
   const loadCluster = useCallback(async () => {
     try {
       setLoading(true);

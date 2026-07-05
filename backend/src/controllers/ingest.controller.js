@@ -1,6 +1,7 @@
 const ingestService = require("../services/ingest.service");
 const { errorResponse, successResponse } = require("../utils/apiResponse");
 
+// Trigger
 async function triggerIngestion(req, res, next) {
   try {
     const result = ingestService.triggerIngestion();

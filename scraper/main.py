@@ -6,15 +6,20 @@ from feeds.extractor import extract_article_content
 from feeds.rss_reader import get_articles
 
 
+# Date
 def _format_cluster_date(value):
     return value.strftime("%Y-%m-%d") if value is not None else ""
 
 
 def main() -> None:
     print("News Pulse Scraper Started")
+    # Fetch
     articles = get_articles()
+    # Extract
     extracted_articles = [extract_article_content(article) for article in articles]
+    # Store
     inserted_count, skipped_count = save_articles(extracted_articles)
+    # Cluster
     cluster_run = cluster_articles()
 
     print("==================================")
@@ -22,6 +27,7 @@ def main() -> None:
     print("==================================")
     print()
 
+    # Report
     for cluster in cluster_run.clusters:
         print(cluster.label)
         print(f"Articles : {cluster.article_count}")

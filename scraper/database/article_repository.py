@@ -6,6 +6,7 @@ from typing import Any
 from database.mongo import get_database
 
 
+# Persist
 def save_articles(articles: list[dict[str, Any]]) -> tuple[int, int]:
     if not articles:
         return 0, 0

@@ -6,6 +6,7 @@ import requests
 import trafilatura
 
 
+# Extract
 def extract_article_content(article: dict[str, Any]) -> dict[str, Any]:
     url = str(article.get("link", "")).strip()
     updated_article = dict(article)

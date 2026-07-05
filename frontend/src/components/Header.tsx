@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useNewsData } from "@/components/NewsDataProvider";
 
+// Header
 export function Header() {
   const { refreshNews, refreshing } = useNewsData();
 

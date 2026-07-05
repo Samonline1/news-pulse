@@ -6,6 +6,7 @@ interface ClusterHeaderProps {
   cluster: ClusterSummary;
 }
 
+// Summary
 export function ClusterHeader({ cluster }: ClusterHeaderProps) {
   const timelineText =
     cluster.startTime || cluster.endTime

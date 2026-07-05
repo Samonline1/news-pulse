@@ -1,6 +1,7 @@
 const clusterService = require("../services/cluster.service");
 const { successResponse } = require("../utils/apiResponse");
 
+// Timeline
 async function getTimeline(req, res, next) {
   try {
     const timeline = await clusterService.getTimeline();

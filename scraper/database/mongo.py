@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from config import settings
 
 
+# Client
 @lru_cache(maxsize=1)
 def get_mongo_client() -> MongoClient:
     if not settings.mongo_uri:
@@ -14,6 +15,7 @@ def get_mongo_client() -> MongoClient:
     return MongoClient(settings.mongo_uri)
 
 
+# Database
 def get_database():
     client = get_mongo_client()
     database = client.get_default_database()

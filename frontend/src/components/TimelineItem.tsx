@@ -7,6 +7,7 @@ interface TimelineItemProps {
   isLast?: boolean;
 }
 
+// Item
 export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
   return (
     <article className="relative grid grid-cols-[1.75rem_1fr] gap-4 sm:grid-cols-[2.5rem_minmax(0,1fr)]">

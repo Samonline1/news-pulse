@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Cluster schema
 const clusterSchema = new mongoose.Schema(
   {
     _id: {

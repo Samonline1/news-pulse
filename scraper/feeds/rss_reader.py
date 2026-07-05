@@ -6,6 +6,7 @@ import feedparser
 from config import settings
 
 
+# Defaults
 DEFAULT_RSS_FEEDS: tuple[tuple[str, str], ...] = (
     ("BBC", "https://feeds.bbci.co.uk/news/rss.xml"),
     ("NPR", "https://feeds.npr.org/1001/rss.xml"),
@@ -13,6 +14,7 @@ DEFAULT_RSS_FEEDS: tuple[tuple[str, str], ...] = (
 )
 
 
+# Clean
 def _clean_value(entry: Any, key: str) -> str:
     value = entry.get(key, "") if hasattr(entry, "get") else ""
     if value is None:
@@ -20,6 +22,7 @@ def _clean_value(entry: Any, key: str) -> str:
     return str(value).strip()
 
 
+# Parse
 def _parse_feed(source: str, url: str) -> list[dict[str, str]]:
     print(f"Fetching {source} feed...")
 
@@ -49,6 +52,7 @@ def _parse_feed(source: str, url: str) -> list[dict[str, str]]:
     return articles
 
 
+# Collect
 def get_articles() -> list[dict[str, str]]:
     articles: list[dict[str, str]] = []
     configured_feeds = settings.rss_feeds or [

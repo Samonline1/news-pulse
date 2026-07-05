@@ -136,6 +136,7 @@ STOP_WORDS = {
     "yourselves",
 }
 
+# Tokens
 WORD_RE = re.compile(r"[a-z0-9]+")
 MIN_LABEL_WORD_LENGTH = 3
 MAX_LABEL_WORDS = 4
@@ -158,12 +159,14 @@ class ClusterRunResult:
     total_articles: int
 
 
+# Keywords
 def _build_keywords(article: dict[str, Any]) -> set[str]:
     text = f"{article.get('title', '')} {article.get('summary', '')}".lower()
     tokens = WORD_RE.findall(text)
     return {token for token in tokens if token not in STOP_WORDS}
 
 
+# Labels
 def _extract_label_words(text: str) -> list[str]:
     tokens = WORD_RE.findall(text.lower())
     return [
@@ -176,6 +179,7 @@ def _extract_label_words(text: str) -> list[str]:
     ]
 
 
+# Parse
 def _parse_datetime(value: Any) -> datetime | None:
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
@@ -192,6 +196,7 @@ def _parse_datetime(value: Any) -> datetime | None:
     return None
 
 
+# Build
 def _format_label(keyword_counts: Counter[str]) -> str:
     # Prefer the most frequent meaningful keywords and keep the label human-readable.
     selected_keywords: list[str] = []
@@ -207,6 +212,7 @@ def _format_label(keyword_counts: Counter[str]) -> str:
     return " ".join(word.capitalize() for word in selected_keywords[:MAX_LABEL_WORDS])
 
 
+# Name
 def _build_cluster_label(group_articles: list[dict[str, Any]]) -> str:
     title_counts: Counter[str] = Counter()
     overall_counts: Counter[str] = Counter()
@@ -253,6 +259,7 @@ def _build_cluster_label(group_articles: list[dict[str, Any]]) -> str:
     return " ".join(word.title() for word in selected_words)
 
 
+# Range
 def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[datetime | None, datetime | None]:
     published_times: list[datetime] = []
 
@@ -267,6 +274,7 @@ def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[
     return min(published_times), max(published_times)
 
 
+# Cluster
 def cluster_articles() -> ClusterRunResult:
     database = get_database()
     articles_collection = database["articles"]
