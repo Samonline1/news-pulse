@@ -1,0 +1,240 @@
+🎥 1. Live Demo (35–40 sec)
+
+### Introduction
+
+// Broswer 
+> Hi, this is **News Pulse**, a full-stack news intelligence platform that aggregates articles from multiple RSS feeds, groups related stories into topic clusters, and visualizes them on an interactive timeline.
+
+### Demo Flow
+
+* Open deployed website
+* Click **Refresh Data**
+
+  * Mention:
+
+    > The backend is hosted on Render's free tier, so the first request may take a few seconds because of cold starts.
+* Show Dashboard
+* Show Timeline
+* Open a Cluster
+* Show Articles
+* Open one original article
+
+for live due to free BE first request may take few second or show error 
+---
+
+
+// VS code 
+# 🏗️ 2. Architecture (25–30 sec)
+
+Open README → Architecture Diagram
+
+### Explain
+
+**3 Services**
+
+### Python Scraper
+
+* Fetches RSS feeds
+* Extracts full article content
+* Removes duplicates
+* Groups similar articles into clusters
+* Stores processed data in MongoDB
+
+↓
+
+### Node.js Backend
+
+* Reads data from MongoDB
+* Exposes REST APIs
+* Serves clusters, articles and timeline
+
+↓
+
+### Next.js Frontend
+
+* Fetches backend APIs
+* Displays Dashboard
+* Timeline
+* Cluster Details
+
+---
+
+VS code
+# 📰 3. Scraper & Topic Grouping (55–60 sec)
+
+Open:
+
+```text
+scraper/
+│
+├── feeds/
+├── clustering/
+├── database/
+└── main.py
+```
+
+### main.py
+
+> This is the entry point.
+
+Flow:
+
+```
+RSS Feed
+
+↓
+
+Fetch Articles
+
+↓
+
+Extract Full Content
+
+↓
+
+Remove Duplicates
+
+↓
+
+Cluster Articles
+
+↓
+
+Store in MongoDB
+```
+
+---
+
+### feeds/
+
+Purpose:
+
+* Fetch RSS feeds
+* Normalize different feed formats
+* Extract:
+
+  * Title
+  * Summary
+  * Published Date
+  * Source
+  * Link
+  * Full Content
+
+---
+
+### database/
+
+Purpose:
+
+Before inserting:
+
+```
+Already Exists?
+
+↓
+
+Yes → Skip
+
+No → Insert
+```
+
+Keeps scraper rerunnable without duplicate articles.
+
+---
+
+### clustering/
+
+Flow:
+
+```
+Article
+
+↓
+
+Lowercase Text
+
+↓
+
+Remove Stop Words
+
+↓
+
+Extract Keywords
+
+↓
+
+Compare Keyword Overlap
+
+↓
+
+Assign Cluster
+
+↓
+
+Generate Cluster Label
+```
+
+If enough meaningful keywords overlap, articles are grouped into the same cluster.
+
+---
+
+### Why Keyword Overlap?
+
+> I chose keyword-overlap because the assignment recommends a simple, reliable approach over unnecessary complexity. It is deterministic, easy to explain, and worked well for clustering related news stories. 
+
+---
+
+VS code
+# ⚠️ 4. Challenge (25–30 sec)
+
+Choose **one** challenge to stay within the time limit.
+
+### Challenge
+
+* Different RSS feeds use different formats
+* Different date formats
+* Missing fields
+* Some article pages fail to parse
+
+Solution:
+
+* Normalize all feeds into one schema
+* Add exception handling
+* Continue processing even if one article fails
+
+**OR**
+
+Threshold challenge:
+
+* Too low → unrelated articles merge
+* Too high → related articles split
+* Tuned the threshold until clusters became reasonably accurate
+
+---
+
+VS code
+# 🚀 5. Future Improvement (10–15 sec)
+
+> With more time, I would replace keyword-overlap clustering with semantic embeddings so articles discussing the same event using different wording could still be grouped together more accurately.
+
+---
+
+# 📝 7-Step Pipeline (Keep this in mind if asked)
+
+```
+RSS Feeds
+      ↓
+Fetch Articles
+      ↓
+Extract Full Content
+      ↓
+Remove Duplicates
+      ↓
+Cluster Similar Articles
+      ↓
+Store in MongoDB
+      ↓
+Backend APIs → Frontend Dashboard
+```
+
+This version fits comfortably within **2.5–3 minutes**, follows the assignment's required order, and focuses on the implementation decisions rather than Python syntax.

@@ -1,10 +1,18 @@
 "use client";
 
+import { useMemo } from "react";
 import { TimelineItem } from "@/components/TimelineItem";
 import { useNewsData } from "@/components/NewsDataProvider";
 
 export function Timeline() {
   const { timeline, timelineLoading, timelineError } = useNewsData();
+  const sortedTimeline = useMemo(() => {
+    return [...timeline].sort((a, b) => {
+      const aTime = new Date(a.endTime ?? a.startTime ?? 0).getTime();
+      const bTime = new Date(b.endTime ?? b.startTime ?? 0).getTime();
+      return bTime - aTime;
+    });
+  }, [timeline]);
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -57,7 +65,7 @@ export function Timeline() {
               </div>
             </div>
           </div>
-        ) : timeline.length === 0 ? (
+        ) : sortedTimeline.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center text-slate-500">
             <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
               <span className="text-3xl" aria-hidden="true">
@@ -75,11 +83,11 @@ export function Timeline() {
           <div className="relative mt-8">
             <div className="absolute left-[0.75rem] top-2 bottom-6 w-px bg-slate-200 sm:left-[1.25rem]" />
             <div className="space-y-1">
-              {timeline.map((cluster, index) => (
+              {sortedTimeline.map((cluster, index) => (
                 <TimelineItem
                   key={cluster.clusterId}
                   cluster={cluster}
-                  isLast={index === timeline.length - 1}
+                  isLast={index === sortedTimeline.length - 1}
                 />
               ))}
             </div>

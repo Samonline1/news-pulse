@@ -35,14 +35,6 @@ interface NewsDataContextValue {
 
 const NewsDataContext = createContext<NewsDataContextValue | null>(null);
 
-function sortByStartTime(items: ClusterSummary[]) {
-  return [...items].sort((a, b) => {
-    const aTime = new Date(a.startTime ?? 0).getTime();
-    const bTime = new Date(b.startTime ?? 0).getTime();
-    return aTime - bTime;
-  });
-}
-
 function getClusterSnapshot(clusters: ClusterSummary[]) {
   const latestTimestamp = clusters.reduce((latest, cluster) => {
     const candidate = Math.max(
@@ -98,7 +90,7 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
       setTimelineLoading(true);
       setTimelineError(null);
       const response = await fetchTimeline();
-      setTimeline(sortByStartTime(response.data || []));
+      setTimeline(response.data || []);
     } catch {
       setTimelineError("Failed to load the timeline. Please try again.");
     } finally {

@@ -48,7 +48,7 @@ async function getTimeline() {
       _id: 0,
     }
   )
-    .sort({ startTime: 1 })
+    .sort({ endTime: -1, startTime: -1 })
     .lean();
 
   return clusters.map(toPublicCluster);
