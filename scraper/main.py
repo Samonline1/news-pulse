@@ -4,6 +4,7 @@ from clustering.keyword_cluster import cluster_articles
 from database.article_repository import save_articles
 from feeds.extractor import extract_article_content
 from feeds.rss_reader import get_articles
+from services.ai_service import generate_summary, generate_title
 
 
 # Date
