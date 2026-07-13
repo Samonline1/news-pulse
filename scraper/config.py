@@ -17,7 +17,7 @@ class Settings:
     environment: str = "development"
     rss_feeds: list[dict[str, str]] = field(default_factory=list)
     groq_api_key: str | None = None
-    ai_model: str = "placeholder"
+    groq_model: str = "placeholder"
     ai_temperature: float = 0.0
     max_tokens: int = 0
 
@@ -69,7 +69,7 @@ settings = Settings(
     environment=os.getenv("ENVIRONMENT", "development"),
     rss_feeds=_parse_rss_feeds(os.getenv("RSS_FEEDS")),
     groq_api_key=os.getenv("GROQ_API_KEY") or None,
-    ai_model=os.getenv("AI_MODEL", "placeholder"),
+    groq_model=os.getenv("GROQ_MODEL", "placeholder"),
     ai_temperature=float(os.getenv("AI_TEMPERATURE", "0")),
     max_tokens=int(os.getenv("MAX_TOKENS", "0")),
 )

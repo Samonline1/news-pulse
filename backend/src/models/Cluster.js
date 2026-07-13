@@ -17,6 +17,13 @@ const clusterSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    titleGenerated: {
+      type: Boolean,
+      default: false,
+    },
+    titleGeneratedAt: {
+      type: Date,
+    },
     keywords: [
       {
         type: String,

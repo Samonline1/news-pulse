@@ -6,9 +6,14 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from itertools import count
+import logging
 from typing import Any
 
 from database.mongo import get_database
+from services.ai_service import generate_title
+
+
+logger = logging.getLogger(__name__)
 
 
 STOP_WORDS = {
@@ -148,6 +153,7 @@ class ClusterSummary:
     cluster_id: str
     label: str
     article_count: int
+    title_generated: bool
     sources: list[str]
     start_time: datetime | None
     end_time: datetime | None
@@ -274,11 +280,42 @@ def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[
     return min(published_times), max(published_times)
 
 
+def _get_headlines(group_articles: list[dict[str, Any]]) -> list[str]:
+    return [
+        str(item["article"].get("title", "")).strip()
+        for item in group_articles
+        if str(item["article"].get("title", "")).strip()
+    ]
+
+
+def _find_previous_ai_title(previous_clusters: list[dict[str, Any]], article_ids: list[Any]) -> dict[str, Any] | None:
+    article_id_set = set(article_ids)
+    for cluster in previous_clusters:
+        if not cluster.get("titleGenerated"):
+            continue
+        previous_article_ids = set(cluster.get("articleIds", []))
+        if previous_article_ids and previous_article_ids.issubset(article_id_set):
+            return cluster
+    return None
+
+
 # Cluster
 def cluster_articles() -> ClusterRunResult:
     database = get_database()
     articles_collection = database["articles"]
     clusters_collection = database["clusters"]
+    previous_clusters = list(
+        clusters_collection.find(
+            {},
+            {
+                "clusterId": 1,
+                "label": 1,
+                "articleIds": 1,
+                "titleGenerated": 1,
+                "titleGeneratedAt": 1,
+            },
+        )
+    )
 
     articles = list(
         articles_collection.find(
@@ -353,6 +390,27 @@ def cluster_articles() -> ClusterRunResult:
         label = _build_cluster_label(group_articles)
         keywords = [keyword for keyword, _ in all_keywords.most_common()]
         start_time, end_time = _collect_cluster_time_bounds(group_articles)
+        title_generated = False
+        title_generated_at = None
+
+        previous_cluster = _find_previous_ai_title(previous_clusters, article_ids)
+        if previous_cluster is not None:
+            label = str(previous_cluster.get("label", label)).strip() or label
+            title_generated = bool(previous_cluster.get("titleGenerated"))
+            title_generated_at = previous_cluster.get("titleGeneratedAt")
+
+        if len(article_ids) >= 2 and not title_generated:
+            headlines = _get_headlines(group_articles)[:3]
+            if len(headlines) >= 2:
+                try:
+                    ai_title = generate_title(cluster_id, headlines)
+                    if ai_title:
+                        label = ai_title
+                        title_generated = True
+                        title_generated_at = datetime.now(timezone.utc)
+                        print(f"[AI] Generated title for cluster {cluster_id}")
+                except Exception as exc:  # pragma: no cover - defensive guard
+                    logger.error("Unexpected AI title generation failure: %s", exc, exc_info=True)
 
         cluster_documents.append(
             {
@@ -365,6 +423,8 @@ def cluster_articles() -> ClusterRunResult:
                 "sources": sources,
                 "startTime": start_time,
                 "endTime": end_time,
+                "titleGenerated": title_generated,
+                "titleGeneratedAt": title_generated_at,
                 "createdAt": datetime.now(timezone.utc),
             }
         )
@@ -374,6 +434,7 @@ def cluster_articles() -> ClusterRunResult:
                 cluster_id=cluster_id,
                 label=label,
                 article_count=len(article_ids),
+                title_generated=title_generated,
                 sources=sources,
                 start_time=start_time,
                 end_time=end_time,
