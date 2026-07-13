@@ -24,6 +24,27 @@ const clusterSchema = new mongoose.Schema(
     titleGeneratedAt: {
       type: Date,
     },
+    summary: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    summaryStatus: {
+      type: String,
+      trim: true,
+      default: "idle",
+    },
+    summaryGeneratedAt: {
+      type: Date,
+    },
+    summaryArticleCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastArticleUpdatedAt: {
+      type: Date,
+    },
     keywords: [
       {
         type: String,

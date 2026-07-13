@@ -154,6 +154,7 @@ class ClusterSummary:
     label: str
     article_count: int
     title_generated: bool
+    summary_status: str
     sources: list[str]
     start_time: datetime | None
     end_time: datetime | None
@@ -280,6 +281,21 @@ def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[
     return min(published_times), max(published_times)
 
 
+def _collect_last_article_updated_at(group_articles: list[dict[str, Any]]) -> datetime | None:
+    updated_times: list[datetime] = []
+
+    for item in group_articles:
+        article = item["article"]
+        created_at = article.get("createdAt")
+        if isinstance(created_at, datetime):
+            updated_times.append(created_at if created_at.tzinfo else created_at.replace(tzinfo=timezone.utc))
+
+    if not updated_times:
+        return None
+
+    return max(updated_times)
+
+
 def _get_headlines(group_articles: list[dict[str, Any]]) -> list[str]:
     return [
         str(item["article"].get("title", "")).strip()
@@ -297,6 +313,19 @@ def _find_previous_ai_title(previous_clusters: list[dict[str, Any]], article_ids
         if previous_article_ids and previous_article_ids.issubset(article_id_set):
             return cluster
     return None
+
+
+def _find_previous_cluster(previous_clusters: list[dict[str, Any]], article_ids: list[Any]) -> dict[str, Any] | None:
+    article_id_set = set(article_ids)
+    best_match: dict[str, Any] | None = None
+    best_match_size = -1
+    for cluster in previous_clusters:
+        previous_article_ids = set(cluster.get("articleIds", []))
+        if previous_article_ids and previous_article_ids.issubset(article_id_set):
+            if len(previous_article_ids) > best_match_size:
+                best_match = cluster
+                best_match_size = len(previous_article_ids)
+    return best_match
 
 
 # Cluster
@@ -326,6 +355,7 @@ def cluster_articles() -> ClusterRunResult:
                 "summary": 1,
                 "published": 1,
                 "source": 1,
+                "createdAt": 1,
             },
         )
     )
@@ -394,6 +424,7 @@ def cluster_articles() -> ClusterRunResult:
         title_generated_at = None
 
         previous_cluster = _find_previous_ai_title(previous_clusters, article_ids)
+        previous_cluster_doc = _find_previous_cluster(previous_clusters, article_ids)
         if previous_cluster is not None:
             label = str(previous_cluster.get("label", label)).strip() or label
             title_generated = bool(previous_cluster.get("titleGenerated"))
@@ -412,6 +443,27 @@ def cluster_articles() -> ClusterRunResult:
                 except Exception as exc:  # pragma: no cover - defensive guard
                     logger.error("Unexpected AI title generation failure: %s", exc, exc_info=True)
 
+        last_article_updated_at = _collect_last_article_updated_at(group_articles)
+        summary_status = "idle"
+        summary = ""
+        summary_generated_at = None
+        summary_article_count = 0
+
+        if previous_cluster_doc is not None:
+            summary = str(previous_cluster_doc.get("summary", "")).strip()
+            summary_status = str(previous_cluster_doc.get("summaryStatus", "idle")).strip() or "idle"
+            summary_generated_at = previous_cluster_doc.get("summaryGeneratedAt")
+            summary_article_count = int(previous_cluster_doc.get("summaryArticleCount") or 0)
+            previous_last_updated = previous_cluster_doc.get("lastArticleUpdatedAt")
+            if (
+                summary
+                and summary_generated_at is not None
+                and last_article_updated_at is not None
+                and previous_last_updated is not None
+                and last_article_updated_at > summary_generated_at
+            ):
+                summary_status = "stale"
+
         cluster_documents.append(
             {
                 "_id": cluster_id,
@@ -425,6 +477,11 @@ def cluster_articles() -> ClusterRunResult:
                 "endTime": end_time,
                 "titleGenerated": title_generated,
                 "titleGeneratedAt": title_generated_at,
+                "summary": summary,
+                "summaryStatus": summary_status,
+                "summaryGeneratedAt": summary_generated_at,
+                "summaryArticleCount": summary_article_count,
+                "lastArticleUpdatedAt": last_article_updated_at,
                 "createdAt": datetime.now(timezone.utc),
             }
         )
@@ -435,6 +492,7 @@ def cluster_articles() -> ClusterRunResult:
                 label=label,
                 article_count=len(article_ids),
                 title_generated=title_generated,
+                summary_status=summary_status,
                 sources=sources,
                 start_time=start_time,
                 end_time=end_time,

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { ArticleCard } from "@/components/ArticleCard";
+import { ClusterAssistantDrawer } from "@/components/ClusterAssistantDrawer";
 import { ClusterHeader } from "@/components/ClusterHeader";
 import { fetchClusterDetails } from "@/services/api";
 import type { ClusterDetails } from "@/types/cluster";
@@ -122,6 +123,7 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
         ) : data ? (
           <div className="space-y-8">
             <ClusterHeader cluster={data.cluster} />
+            <ClusterAssistantDrawer clusterId={clusterId} />
 
             <section className="rounded-3xl border border-white/70 bg-white/75 p-6 shadow-soft backdrop-blur sm:p-8">
               <div className="flex items-end justify-between gap-4">
