@@ -10,6 +10,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# Clustering
+EMBEDDING_SIMILARITY_THRESHOLD = float(os.getenv("EMBEDDING_SIMILARITY_THRESHOLD", "0.72"))
+
+
 # Settings
 @dataclass(frozen=True, slots=True)
 class Settings:

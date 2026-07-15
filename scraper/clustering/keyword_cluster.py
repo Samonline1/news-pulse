@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import logging
 import re
-from email.utils import parsedate_to_datetime
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from itertools import count
-import logging
 from typing import Any
 
+from sentence_transformers import util
+
+from clustering.embedding_model import build_article_embedding, get_embedding_model
+from config import EMBEDDING_SIMILARITY_THRESHOLD
 from database.mongo import get_database
 from services.ai_service import generate_title
 
@@ -141,7 +145,6 @@ STOP_WORDS = {
     "yourselves",
 }
 
-# Tokens
 WORD_RE = re.compile(r"[a-z0-9]+")
 MIN_LABEL_WORD_LENGTH = 3
 MAX_LABEL_WORDS = 4
@@ -166,14 +169,6 @@ class ClusterRunResult:
     total_articles: int
 
 
-# Keywords
-def _build_keywords(article: dict[str, Any]) -> set[str]:
-    text = f"{article.get('title', '')} {article.get('summary', '')}".lower()
-    tokens = WORD_RE.findall(text)
-    return {token for token in tokens if token not in STOP_WORDS}
-
-
-# Labels
 def _extract_label_words(text: str) -> list[str]:
     tokens = WORD_RE.findall(text.lower())
     return [
@@ -186,7 +181,13 @@ def _extract_label_words(text: str) -> list[str]:
     ]
 
 
-# Parse
+def _build_article_text(article: dict[str, Any]) -> str:
+    title = str(article.get("title", "")).strip()
+    summary = str(article.get("summary", "")).strip()
+    content = str(article.get("content", "")).strip()
+    return " ".join(part for part in [title, summary, content] if part)
+
+
 def _parse_datetime(value: Any) -> datetime | None:
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
@@ -203,23 +204,6 @@ def _parse_datetime(value: Any) -> datetime | None:
     return None
 
 
-# Build
-def _format_label(keyword_counts: Counter[str]) -> str:
-    # Prefer the most frequent meaningful keywords and keep the label human-readable.
-    selected_keywords: list[str] = []
-    for keyword, _ in keyword_counts.most_common():
-        if keyword not in selected_keywords:
-            selected_keywords.append(keyword)
-        if len(selected_keywords) == MAX_LABEL_WORDS:
-            break
-
-    if len(selected_keywords) < MIN_LABEL_WORDS:
-        return "General"
-
-    return " ".join(word.capitalize() for word in selected_keywords[:MAX_LABEL_WORDS])
-
-
-# Name
 def _build_cluster_label(group_articles: list[dict[str, Any]]) -> str:
     title_counts: Counter[str] = Counter()
     overall_counts: Counter[str] = Counter()
@@ -266,7 +250,6 @@ def _build_cluster_label(group_articles: list[dict[str, Any]]) -> str:
     return " ".join(word.title() for word in selected_words)
 
 
-# Range
 def _collect_cluster_time_bounds(group_articles: list[dict[str, Any]]) -> tuple[datetime | None, datetime | None]:
     published_times: list[datetime] = []
 
@@ -328,7 +311,6 @@ def _find_previous_cluster(previous_clusters: list[dict[str, Any]], article_ids:
     return best_match
 
 
-# Cluster
 def cluster_articles() -> ClusterRunResult:
     database = get_database()
     articles_collection = database["articles"]
@@ -364,36 +346,72 @@ def cluster_articles() -> ClusterRunResult:
         clusters_collection.delete_many({})
         return ClusterRunResult(clusters=[], total_articles=0)
 
-    article_keywords: list[tuple[dict[str, Any], set[str]]] = []
+    # Load the embedding model once when clustering starts.
+    get_embedding_model()
+
+    article_embeddings: list[tuple[dict[str, Any], Any | None]] = []
     for article in articles:
-        article_keywords.append((article, _build_keywords(article)))
+        article_text = _build_article_text(article)
+        if not article_text:
+            logger.warning("Skipping embedding generation for article %s due to empty text", article.get("_id"))
+            article_embeddings.append((article, None))
+            continue
 
-    parent: dict[Any, Any] = {}
+        try:
+            # Generate one semantic embedding per article for cosine similarity matching.
+            embedding = build_article_embedding(article_text)
+            article_embeddings.append((article, embedding))
+        except Exception as exc:  # pragma: no cover - defensive guard
+            logger.error("Failed to generate embedding for article %s: %s", article.get("_id"), exc, exc_info=True)
+            article_embeddings.append((article, None))
 
-    def find(item: Any) -> Any:
-        parent.setdefault(item, item)
-        if parent[item] != item:
-            parent[item] = find(parent[item])
-        return parent[item]
+    cluster_states: list[dict[str, Any]] = []
+    cluster_groups: dict[str, list[dict[str, Any]]] = {}
 
-    def union(left: Any, right: Any) -> None:
-        left_root = find(left)
-        right_root = find(right)
-        if left_root != right_root:
-            parent[right_root] = left_root
+    for article, embedding in article_embeddings:
+        article_id = article["_id"]
+        article_title = str(article.get("title", "")).strip() or "<untitled>"
+        compared_count = 0
+        best_similarity = -1.0
+        best_cluster_id: str | None = None
 
-    # Keep the core clustering rule unchanged: pairwise overlap of at least 3 keywords.
-    for index, (article, keywords) in enumerate(article_keywords):
-        parent[article["_id"]] = article["_id"]
-        for other_index in range(index + 1, len(article_keywords)):
-            other_article, other_keywords = article_keywords[other_index]
-            if len(keywords.intersection(other_keywords)) >= 3:
-                union(article["_id"], other_article["_id"])
+        if embedding is not None and cluster_states:
+            for cluster_state in cluster_states:
+                representative_embedding = cluster_state["representative_embedding"]
+                if representative_embedding is None:
+                    continue
 
-    cluster_groups: dict[Any, list[dict[str, Any]]] = {}
-    for article, keywords in article_keywords:
-        root = find(article["_id"])
-        cluster_groups.setdefault(root, []).append({"article": article, "keywords": keywords})
+                compared_count += 1
+                # Cosine similarity measures how close two semantic embeddings are.
+                similarity = float(util.cos_sim(embedding, representative_embedding).item())
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_cluster_id = cluster_state["cluster_id"]
+
+        decision = "Created new cluster"
+        assigned_cluster_id = None
+
+        if best_cluster_id is not None and best_similarity >= EMBEDDING_SIMILARITY_THRESHOLD:
+            assigned_cluster_id = best_cluster_id
+            decision = "Added to existing cluster"
+        else:
+            assigned_cluster_id = f"cluster-{len(cluster_states) + 1}"
+            cluster_states.append(
+                {
+                    "cluster_id": assigned_cluster_id,
+                    "representative_embedding": embedding,
+                }
+            )
+            decision = "Created new cluster"
+
+        cluster_groups.setdefault(assigned_cluster_id, []).append({"article": article, "embedding": embedding})
+
+        print("[Embedding][Debug] Article title:", article_title)
+        print("[Embedding][Debug] Compared against:", compared_count)
+        print("[Embedding][Debug] Best matching cluster ID:", best_cluster_id)
+        print("[Embedding][Debug] Highest cosine similarity:", f"{max(best_similarity, 0.0):.4f}")
+        print("[Embedding][Debug] Configured threshold:", f"{EMBEDDING_SIMILARITY_THRESHOLD:.2f}")
+        print("[Embedding][Debug] Final decision:", decision)
 
     clusters_collection.delete_many({})
 
@@ -410,7 +428,8 @@ def cluster_articles() -> ClusterRunResult:
 
         for item in group_articles:
             article = item["article"]
-            all_keywords.update(item["keywords"])
+            label_text = _build_article_text(article)
+            all_keywords.update(_extract_label_words(label_text))
             article_ids.append(article["_id"])
 
             source = str(article.get("source", "")).strip()
