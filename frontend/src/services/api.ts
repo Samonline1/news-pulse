@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ClusterDetails, ClusterSummary } from "@/types/cluster";
+import type { ClusterDetails, ClusterSummary, ClusterSummaryPayload } from "@/types/cluster";
 
 // Client
 const api = axios.create({
@@ -39,6 +39,15 @@ export async function fetchTimeline() {
 // Details
 export async function fetchClusterDetails(clusterId: string) {
   return unwrapResponse<ClusterDetails>(api.get(`/clusters/${clusterId}`));
+}
+
+// Summary
+export async function fetchClusterSummary(clusterId: string) {
+  return unwrapResponse<ClusterSummaryPayload>(api.get(`/clusters/${clusterId}/summary`));
+}
+
+export async function refreshClusterSummary(clusterId: string) {
+  return unwrapResponse<ClusterSummaryPayload>(api.post(`/clusters/${clusterId}/summary/refresh`));
 }
 
 // Trigger

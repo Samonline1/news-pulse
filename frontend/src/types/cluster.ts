@@ -5,6 +5,13 @@ export interface ClusterSummary {
   sources?: string[];
   startTime?: string;
   endTime?: string;
+  titleGenerated?: boolean;
+  titleGeneratedAt?: string;
+  summary?: string;
+  summaryStatus?: "idle" | "generating" | "ready" | "stale" | "failed";
+  summaryGeneratedAt?: string;
+  summaryArticleCount?: number;
+  lastArticleUpdatedAt?: string;
 }
 
 export interface ClustersResponse {
@@ -28,4 +35,12 @@ export interface ArticleDetails {
 export interface ClusterDetails {
   cluster: ClusterSummary;
   articles: ArticleDetails[];
+}
+
+export interface ClusterSummaryPayload {
+  summary: string;
+  summaryGeneratedAt?: string;
+  summaryArticleCount?: number;
+  lastArticleUpdatedAt?: string;
+  summaryStatus?: "idle" | "generating" | "ready" | "stale" | "failed";
 }

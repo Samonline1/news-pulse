@@ -23,7 +23,7 @@ export default function HomePage() {
               </h2>
             </div>
             <p className="text-sm text-slate-500">
-              Powered by the backend cluster API
+              Number of clusters: {clusters.length}
             </p>
           </div>
 
