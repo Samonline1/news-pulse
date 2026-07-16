@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { NewsDataProvider } from "@/components/NewsDataProvider";
 import type { Metadata, Viewport } from "next";
