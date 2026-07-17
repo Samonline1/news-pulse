@@ -16,8 +16,8 @@ export default function HomePage() {
     case "latest":
       sortedClusters.sort(
         (a, b) =>
-          new Date(b.endTime).getTime() -
-          new Date(a.endTime).getTime()
+         new Date(b.endTime ?? 0).getTime() -
+    new Date(a.endTime ?? 0).getTime()
       );
       break;
 
