@@ -67,6 +67,12 @@ const clusterSchema = new mongoose.Schema(
         trim: true,
       },
     ],
+    categories: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     startTime: {
       type: Date,
     },

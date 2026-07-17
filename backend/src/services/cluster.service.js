@@ -19,6 +19,7 @@ async function getAllClusters() {
       label: 1,
       articleCount: 1,
       sources: 1,
+      categories: 1,
       startTime: 1,
       endTime: 1,
       _id: 0,
@@ -39,6 +40,7 @@ async function getTimeline() {
       articleCount: 1,
       startTime: 1,
       endTime: 1,
+      categories: 1,
       _id: 0,
     }
   )
@@ -56,6 +58,7 @@ async function getClusterDetails(clusterId) {
       label: 1,
       articleCount: 1,
       sources: 1,
+      categories: 1,
       startTime: 1,
       endTime: 1,
       summary: 1,

@@ -287,6 +287,46 @@ def _get_headlines(group_articles: list[dict[str, Any]]) -> list[str]:
     ]
 
 
+def _collect_unique_text_values(group_articles: list[dict[str, Any]], key: str) -> list[str]:
+    values: list[str] = []
+    seen: set[str] = set()
+
+    for item in group_articles:
+        raw_value = item["article"].get(key)
+        if not raw_value:
+            continue
+
+        if isinstance(raw_value, str):
+            candidates = [raw_value]
+        elif isinstance(raw_value, list):
+            candidates = [str(value).strip() for value in raw_value]
+        else:
+            candidates = [str(raw_value).strip()]
+
+        for candidate in candidates:
+            candidate = candidate.strip()
+            if not candidate or candidate in seen:
+                continue
+            seen.add(candidate)
+            values.append(candidate)
+
+    return values
+
+
+def _collect_first_text_value(group_articles: list[dict[str, Any]], key: str) -> str:
+    for item in group_articles:
+        raw_value = item["article"].get(key)
+        if isinstance(raw_value, str):
+            value = raw_value.strip()
+            if value:
+                return value
+        elif raw_value:
+            value = str(raw_value).strip()
+            if value:
+                return value
+    return ""
+
+
 def _find_previous_ai_title(previous_clusters: list[dict[str, Any]], article_ids: list[Any]) -> dict[str, Any] | None:
     article_id_set = set(article_ids)
     for cluster in previous_clusters:
@@ -337,6 +377,9 @@ def cluster_articles() -> ClusterRunResult:
                 "summary": 1,
                 "published": 1,
                 "source": 1,
+                "authors": 1,
+                "categories": 1,
+                "image": 1,
                 "createdAt": 1,
             },
         )
@@ -438,6 +481,7 @@ def cluster_articles() -> ClusterRunResult:
 
         label = _build_cluster_label(group_articles)
         keywords = [keyword for keyword, _ in all_keywords.most_common()]
+        categories = _collect_unique_text_values(group_articles, "categories")
         start_time, end_time = _collect_cluster_time_bounds(group_articles)
         title_generated = False
         title_generated_at = None
@@ -492,8 +536,10 @@ def cluster_articles() -> ClusterRunResult:
                 "articleCount": len(article_ids),
                 "articleIds": article_ids,
                 "sources": sources,
+                "categories": categories,
                 "startTime": start_time,
                 "endTime": end_time,
+                "lastArticleUpdatedAt": last_article_updated_at,
                 "titleGenerated": title_generated,
                 "titleGeneratedAt": title_generated_at,
                 "summary": summary,

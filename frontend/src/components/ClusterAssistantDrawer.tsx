@@ -122,7 +122,7 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4 ">
           <button
             type="button"
             aria-label="Close AI assistant"
@@ -134,21 +134,21 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
             role="dialog"
             aria-modal="true"
             aria-labelledby="ai-assistant-title"
-            className="relative flex max-h-[calc(100vh-3rem)] w-[95%] max-w-[720px] flex-col overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.3)] sm:w-[90%]"
+            className="relative flex max-h-[calc(100vh-3rem)] w-[95%] max-w-[720px] flex-col overflow-hidden rounded-3xl border border-white/70 bg-white  dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900dark:border-slate-700 dark:bg-slate-900 shadow-[0_28px_80px_rgba(15,23,42,0.3)] sm:w-[90%]"
           >
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6 ">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-200">
                   AI Assistant
                 </p>
-                <h2 id="ai-assistant-title" className="mt-1 text-xl font-semibold text-ink-900">
+                <h2 id="ai-assistant-title" className="mt-1 text-xl font-semibold text-ink-900 dark:text-slate-200">
                   Cluster Summary
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-900 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
                 aria-label="Close modal"
               >
                 x
@@ -177,11 +177,11 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
                 </div>
               ) : summary ? (
                 <div className="flex h-full min-h-0 flex-col gap-4">
-                  <section className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <section className="rounded-2xl border border-slate-200 bg-slate-50 dark:bg-slate-900  p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em]  ">
                       AI Summary
                     </p>
-                    <div className="mt-3 max-h-[260px] overflow-y-auto pr-2 text-sm leading-7 text-slate-700 sm:max-h-[240px]">
+                    <div className="mt-3 max-h-[260px] overflow-y-auto pr-2 text-sm leading-7 text-slate-700 dark:text-slate-200 ">
                       {summary.summary || "No summary available."}
                     </div>
                   </section>
@@ -200,7 +200,7 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
                   </section>
 
                   <div className="mt-auto flex flex-col gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-slate-500 ">
                       {showUpToDate
                         ? "Up to date"
                         : summary.summaryStatus === "stale"
@@ -213,7 +213,7 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
                       disabled={refreshDisabled}
                       className={`inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2 ${
                         refreshDisabled
-                          ? "cursor-not-allowed bg-slate-200 text-slate-500"
+                          ? "cursor-not-allowed bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-200"
                           : "bg-ink-900 text-white hover:bg-ink-800"
                       }`}
                     >
@@ -245,9 +245,9 @@ function ModalSkeleton() {
 
       <section className="grid gap-2 sm:grid-cols-2">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+          <div key={index} className="rounded-2xl border border-slate-200 bg-white  dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900dark:border-slate-700 dark:bg-slate-900 px-4 py-3">
             <div className="h-3 w-20 animate-pulse rounded-full bg-slate-200" />
-            <div className="mt-2 h-4 w-32 animate-pulse rounded-full bg-slate-100" />
+            <div className="mt-2 h-4 w-32 animate-pulse rounded-full bg-slate-900" />
           </div>
         ))}
       </section>
@@ -262,11 +262,11 @@ function ModalSkeleton() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+    <div className="rounded-2xl border border-slate-200 bg-white  dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900 dark:bg-slate-900dark:border-slate-700 dark:bg-slate-900 px-4 py-3">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-200">
         {label}
       </p>
-      <p className="mt-1 text-sm font-medium text-slate-700">{value || "Unavailable"}</p>
+      <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200">{value || "Unavailable"}</p>
     </div>
   );
 }

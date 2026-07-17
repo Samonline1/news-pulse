@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { NewsDataProvider } from "@/components/NewsDataProvider";
 import type { Metadata, Viewport } from "next";
-
+import { Provider } from "@/components/theme-provider";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -25,9 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <NewsDataProvider>{children}</NewsDataProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-transparent antialiased text-slate-900 dark:text-slate-100">
+        <Provider>
+          <NewsDataProvider>{children}</NewsDataProvider>
+        </Provider>
       </body>
     </html>
   );
