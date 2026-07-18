@@ -22,6 +22,20 @@ def _clean_value(entry: Any, key: str) -> str:
     return str(value).strip()
 
 
+def _extract_categories(entry: Any) -> list[str]:
+    categories: list[str] = []
+    raw_tags = getattr(entry, "tags", None) or entry.get("tags", []) if hasattr(entry, "get") else []
+    for tag in raw_tags or []:
+        if isinstance(tag, dict):
+            term = str(tag.get("term", "")).strip()
+        else:
+            term = str(tag).strip()
+        if term and term not in categories:
+            categories.append(term)
+
+    return categories
+
+
 # Parse
 def _parse_feed(source: str, url: str) -> list[dict[str, str]]:
     print(f"Fetching {source} feed...")
@@ -46,6 +60,7 @@ def _parse_feed(source: str, url: str) -> list[dict[str, str]]:
                 "published": _clean_value(entry, "published"),
                 "summary": _clean_value(entry, "summary"),
                 "source": source,
+                "categories": _extract_categories(entry),
             }
         )
 

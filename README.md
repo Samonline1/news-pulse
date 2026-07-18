@@ -288,6 +288,19 @@ MongoDB
 - Dashboard, timeline, and cluster detail views
 - Health check endpoint for backend monitoring
 
+## What’s New
+
+This update makes News Pulse smarter and easier to use:
+
+- AI-generated cluster titles with Groq
+- AI summaries for clusters, with cached results
+- Refresh option for summary regeneration
+- Smarter summary updates when new articles arrive
+- Better clustering using semantic embeddings instead of only keyword matching
+- AI assistant modal and better loading states in the frontend
+- Reusable backend AI services with cached responses
+- Less repeated AI usage by reusing existing summaries where possible
+
 ---
 
 ## Tech Stack
@@ -437,4 +450,3 @@ By default:
 - Automatic scheduled scraping is limited on free hosting.
 
 This approach is intentionally lightweight and practical, but these limitations should be kept in mind when interpreting cluster results.
-

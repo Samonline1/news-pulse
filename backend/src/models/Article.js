@@ -18,6 +18,12 @@ const articleSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    categories: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     published: {
       type: String,
       trim: true,

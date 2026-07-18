@@ -1,54 +1,88 @@
 "use client";
 
 import Link from "next/link";
+import { Search, Bell, RefreshCw, ArrowUpRight, Rss } from "lucide-react";
 import { useNewsData } from "@/components/NewsDataProvider";
+import { ThemeToggle } from "./theme-toggle";
 
-// Header
 export function Header() {
   const { refreshNews, refreshing } = useNewsData();
 
   return (
-    <header className="border-b border-slate-200/70 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-        <div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
+    <header className="px-4 pt-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between lg:px-6 py-4">
+
+        {/* Left */}
+        <div
+          className="group inline-flex items-center gap-3 rounded-full  px-4 py-2 font-semibold text-slate-900  dark:border-slate-700  dark:text-slate-100">
+          {/* <p className="text-xs text-slate-500">Welcome,</p> */}
+
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition-transform duration-300 group-hover:hover:scale-110 dark:bg-slate-100 dark:text-slate-900">
+            <Rss className="h-5 w-5" />
+
+          </span>
+
+          <p className="text-xl hidden lg:block text-slate-300 dark:text-slate-600">|</p>
+
+          <h2 className="text-xl hidden lg:block font-semibold text-slate-900 dark:text-slate-100">
             News Pulse
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
-            Cluster Dashboard
-          </h1>
+
+          </h2>
+
         </div>
+
+        {/* Search */}
+        {/* <div className="mx-8 hidden max-w-xl flex-1 md:block">
+          <div className="flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 transition focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-sky-400">
+
+            <Search className="mr-3 h-4 w-4 text-slate-400" />
+
+            <input
+              type="text"
+              placeholder="Search news title, source, or cluster..."
+              className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            />
+
+          </div>
+        </div>  */}
+
+        {/* Right */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => void refreshNews()}
-            disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-all hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {refreshing ? (
-              <>
-                <span
-                  className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-400 border-t-transparent"
-                  aria-hidden="true"
-                />
-                Refreshing...
-              </>
-            ) : (
-              "Refresh News"
-            )}
-          </button>
+
           <Link
             href="/"
-            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-all hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
-          >
+            className="group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
+
             Dashboard
           </Link>
+
           <Link
             href="/timeline"
-            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 transition-all hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
-          >
+            className="group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
+
             Timeline
           </Link>
+
+          {/* <button
+            onClick={() => void refreshNews()}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-60"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${
+                refreshing ? "animate-spin" : ""
+              }`}
+            />
+
+            {refreshing ? "Refreshing..." : "Refresh News"}
+          </button> */}
+
+
+
+
+          <ThemeToggle />
+
+
         </div>
       </div>
     </header>
