@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-transparent antialiased text-slate-900 dark:text-slate-100">
+      <body className="min-h-screen bg-slate-300/30 antialiased text-slate-900 dark:text-slate-100">
         <Provider>
           <NewsDataProvider>{children}</NewsDataProvider>
         </Provider>

@@ -16,8 +16,8 @@ export function Timeline() {
   }, [timeline]);
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="rounded-3xl border border-white/70 bg-white/75 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-5">
+      <div className="rounded-3xl border border-white/70 bg-slate-300/30 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Timeline

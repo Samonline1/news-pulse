@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ArticleDetails } from "@/types/cluster";
 import { formatDisplayDate } from "@/lib/formatDate";
-
+import { ArrowUpRight } from "lucide-react";
 interface ArticleCardProps {
   article: ArticleDetails;
 }
@@ -36,9 +36,13 @@ export function ArticleCard({ article }: ArticleCardProps) {
             href={article.link}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2 focus:ring-offset-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:focus:ring-offset-slate-950"
+                    className="group inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600"
           >
-            Read Original
+            <span>Read Original</span>
+
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white transition-transform duration-300 group-hover:translate-x-1 dark:bg-slate-100 dark:text-slate-900">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
           </Link>
         ) : (
           <button
@@ -47,6 +51,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             className="inline-flex cursor-not-allowed items-center justify-center rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-500"
           >
             Read Original
+            
           </button>
         )}
       </div>

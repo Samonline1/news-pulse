@@ -27,12 +27,12 @@ export function ClusterCard({ cluster }: ClusterCardProps) {
 
       <div className="mt-6 flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-          {cluster.sources[0]?.charAt(0)}
+          {cluster.sources?.[0]?.charAt(0) ?? "?"}
         </div>
 
         <div>
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            {cluster.sources.join(", ")}
+            {cluster.sources?.join(", ") ?? "Unknown source"}
           </p>
 
           <p className="text-xs text-slate-500 dark:text-slate-400">

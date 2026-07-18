@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ClusterSummary } from "@/types/cluster";
 import { formatDisplayDate } from "@/lib/formatDate";
+import { ArrowUpRight } from "lucide-react";
 
 interface TimelineItemProps {
   cluster: ClusterSummary;
@@ -23,7 +24,7 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                Cluster
+                Topic
               </p>
               <h3 className="mt-2 text-lg font-semibold tracking-tight text-ink-900 dark:text-slate-100 sm:text-xl">
                 {cluster.label}
@@ -54,12 +55,17 @@ export function TimelineItem({ cluster, isLast = false }: TimelineItemProps) {
             </div>
           </dl>
 
-          <div className="mt-5 flex justify-start">
+          <div className="mt-5 flex justify-end">
             <Link
               href={`/clusters/${cluster.clusterId}`}
-              className="inline-flex items-center justify-center rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2 focus:ring-offset-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:focus:ring-offset-slate-950"
+            className="group inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600"
             >
-              View Details
+             <span> View Details</span>
+
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white transition-transform duration-300 group-hover:translate-x-1 dark:bg-slate-100 dark:text-slate-900">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
+
             </Link>
           </div>
         </div>
