@@ -1,277 +1,99 @@
-<div align="center">
+# 📰 NewsPulse AI
 
-# News Pulse
+> **AI-powered news intelligence platform** that aggregates news from multiple publishers, groups related stories using semantic embeddings, and generates AI-powered titles and summaries for faster news discovery.
 
-**A news aggregation dashboard that scrapes RSS feeds, groups related stories into clusters, and presents them in a clean dashboard and timeline experience.**
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
+![Express](https://img.shields.io/badge/Express-4-black?style=flat-square&logo=express)
+![Python](https://img.shields.io/badge/Python-3-blue?style=flat-square&logo=python)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=flat-square&logo=mongodb)
+![Groq](https://img.shields.io/badge/Groq-LLM-orange?style=flat-square)
+![SentenceTransformers](https://img.shields.io/badge/Sentence-Transformers-red?style=flat-square)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Express](https://img.shields.io/badge/Express-4-339933?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
-[![Python](https://img.shields.io/badge/Python-Scraper-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+##  Live Demo
 
-Frontend: **https://news-pulsei.vercel.app/**
-
-</div>
+- **Frontend:** https://news-pulsei.vercel.app/
+- Backend: Render
+- Database: MongoDB Atlas
 
 ---
 
-## Project Overview
+#  Demo
 
-News Pulse is a news aggregation dashboard that collects RSS feeds, extracts the full article text, groups related stories into topic clusters, and presents the results in a clean dashboard and timeline experience.
+## 🎥 Demo
 
-## Problem Statement
-
-News stories about the same event are often published by multiple outlets at different times and with different wording. News Pulse exists to reduce that noise by collecting articles from several sources, removing duplicates, clustering related coverage, and making it easier to follow a story across publishers.
-
-## Architecture Diagram
-
-```text
-                    RSS Feeds
-            BBC | NPR | Reuters
-                     |
-                     v
-             Python Scraper
-                     |
-      RSS Parsing + Article Extraction
-                     |
-                     v
-          Duplicate Detection
-                     |
-                     v
-      Keyword-based Article Clustering
-                     |
-                     v
-               MongoDB Atlas
-      Articles Collection + Clusters Collection
-                     |
-                     v
-            Express.js Backend API
-                     |
-                     v
-              Next.js Frontend
-                     |
-                     v
-      Dashboard | Timeline | Cluster Details
-```
-
-## System Architecture
-
-News Pulse is built as three connected parts:
-
-1. The Python scraper fetches and processes news articles.
-2. The Express backend reads the processed data from MongoDB and exposes REST APIs.
-3. The Next.js frontend consumes those APIs and renders the user interface.
-
-The backend and scraper do not communicate through a direct internal API. They both work with the same MongoDB database.
-
-
-*3 Services*
-
-### Python Scraper
-
-* Fetches RSS feeds
-* Extracts full article content
-* Removes duplicates
-* Groups similar articles into clusters
-* Stores processed data in MongoDB
-
-↓
-
-### Node.js Backend
-
-* Reads data from MongoDB
-* Exposes REST APIs
-* Serves clusters, articles and timeline
-
-↓
-
-### Next.js Frontend
-
-* Fetches backend APIs
-* Displays Dashboard
-* Timeline
-* Cluster Details
+<p align="center">
+  <img src="/assets/demo.gif" alt="NewsPulse AI Demo" width="900"/>
+</p>
 
 
 ---
 
-## How The App Works
+#  Features
 
-### Step 1 - Fetch RSS Feeds
+##  AI
 
-The scraper periodically reads RSS feeds from multiple news providers.
+- Semantic clustering using **Sentence Transformers (all-MiniLM-L6-v2)**
+- AI-generated cluster titles using **Groq LLM**
+- AI-generated news summaries
+- Cached summaries stored in MongoDB
+- AI assistant for summarized news insights
 
-## News Sources
+##  News Processing
 
-Current sources include:
+- RSS aggregation from multiple publishers
+- Full article extraction
+- Duplicate detection
+- Semantic article clustering
+- Multi-source event grouping
 
-- BBC RSS
-- NPR RSS
-- Reuters RSS
+##  Frontend
 
-Reuters may occasionally be unavailable because of DNS or network issues, but the scraper continues processing the remaining sources.
+- Modern Next.js dashboard
+- Search
+- Timeline visualization
+- Cluster detail pages
+- Dark mode
+- Responsive design
+- Loading states & skeletons
 
-Each RSS feed provides:
+##  Backend
 
-- Title
-- Article URL
-- Published date
-- Summary
+- REST API
+- Health endpoint
+- MongoDB integration
+- Automatic scheduled ingestion pipeline
 
-### Step 2 - Extract Full Article Content
+---
 
-RSS feeds only contain short summaries.
-
-For every RSS item, the scraper downloads the original webpage and extracts the complete readable article.
-
-```text
-RSS URL
-  |
-  v
-Download HTML
-  |
-  v
-Extract Main Content
-```
-
-This produces much richer content for clustering than RSS summaries alone.
-
-### Step 3 - Remove Duplicate Articles
-
-Before storing an article, the scraper checks whether it already exists.
+#  Architecture
 
 ```text
-Article URL
-  |
-  v
-Already Exists?
-  |
-+-+--+
-|    |
-Yes  No
-|    |
-Skip Insert
-```
-
-This ensures repeated scraper runs do not create duplicate records.
-
-### Step 4 - Cluster Similar Articles
-
-After storing articles, the scraper groups articles discussing the same event.
-
-The clustering process:
-
-1. Remove stop words from article text.
-2. Extract and compare overlapping keywords.
-3. Measure keyword similarity between articles.
-4. Generate a cluster label from the most frequent keywords.
-5. Assign articles to a cluster.
-
-Example:
-
-```text
-BBC
-NPR
-Reuters
-
-v
-
-World Cup Match
-
-v
-
-Cluster-7
-```
-
-Each cluster represents one news event reported by multiple publishers.
-
-## Topic Grouping
-
-Topic grouping is keyword-based. The scraper removes stop words, compares overlapping keywords, and groups articles that share enough related terms. Once a cluster is formed, the label is generated from the strongest keywords in that group.
-
-### Step 5 - Store Processed Data
-
-Processed information is stored inside MongoDB.
-
-#### Articles Collection
-
-Each article contains:
-
-- Title
-- Link
-- Summary
-- Content
-- Published date
-- Source
-- Cluster ID
-
-#### Clusters Collection
-
-Each cluster stores:
-
-- Cluster ID
-- Cluster label
-- Number of articles
-- Sources
-- Start time
-- End time
-
-### Step 6 - Backend API
-
-The Express backend reads processed data from MongoDB and exposes REST APIs for the frontend.
-
-```text
-MongoDB
-  |
-  v
-Express API
-  |
-  v
-JSON Response
-```
-
-### Backend API Endpoints
-
-The main API routes are:
-
-- `GET /health` - health check and database connectivity
-- `GET /api/clusters` - fetch all cluster summaries
-- `GET /api/clusters/:clusterId` - fetch details for one cluster
-- `GET /api/timeline` - fetch timeline-friendly article or cluster data
-- `POST /api/ingest/trigger` - start a new scraper run
-
-The response format is consistent across endpoints:
-
-```json
-{
-  "success": true,
-  "data": {},
-  "message": "OK"
-}
-```
-
-Note: the first scraper run can take a little time because it downloads feeds, extracts articles, and rebuilds clusters. Later refreshes usually feel quicker.
-
-### Step 7 - Frontend
-
-The Next.js application consumes the backend APIs and displays:
-
-- Dashboard
-- Cluster list
-- Cluster details
-- Timeline view
-
-```text
-Browser
-  |
-  v
+RSS Feeds
+(BBC • NPR • Reuters)
+        │
+        ▼
+Python Scraper
+        │
+Extract Full Articles
+        │
+        ▼
+Sentence Transformers
+(all-MiniLM-L6-v2)
+        │
+Semantic Clustering
+        │
+        ▼
+Groq LLM
+Titles + Summaries
+        │
+        ▼
+MongoDB Atlas
+        │
+        ▼
+Express REST API
+        │
+        ▼
 Next.js Frontend
-  |
-  v
-Express API
-  |
-  v
-MongoDB
 ```
 
 ---
@@ -288,101 +110,54 @@ MongoDB
 - Dashboard, timeline, and cluster detail views
 - Health check endpoint for backend monitoring
 
-## What’s New
+---
 
-This update makes News Pulse smarter and easier to use:
+#  Tech Stack
 
-- AI-generated cluster titles with Groq
-- AI summaries for clusters, with cached results
-- Refresh option for summary regeneration
-- Smarter summary updates when new articles arrive
-- Better clustering using semantic embeddings instead of only keyword matching
-- AI assistant modal and better loading states in the frontend
-- Reusable backend AI services with cached responses
-- Less repeated AI usage by reusing existing summaries where possible
+| Layer | Technologies |
+|--------|--------------|
+| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS, Axios |
+| Backend | Node.js, Express, Mongoose, Groq API |
+| AI | Sentence Transformers (all-MiniLM-L6-v2), Groq LLM |
+| Scraper | Python, feedparser, trafilatura, requests, scikit-learn |
+| Database | MongoDB Atlas |
+| Deployment | Vercel, Render |
 
 ---
 
-## Tech Stack
+#  Project Structure
 
-### Frontend
-
-- Next.js 15
-- React 19
-- TypeScript
-- Tailwind CSS
-- Axios
-
-### Backend
-
-- Node.js
-- Express 4
-- Mongoose
-- CORS
-- dotenv
-
-### Scraper
-
-- Python 3
-- `feedparser`
-- `trafilatura`
-- `requests`
-- `pymongo`
-
-### Database
-
-- MongoDB Atlas
-- Collections: `articles`, `clusters`
+```text
+news-pulse/
+│
+├── frontend/
+├── backend/
+├── scraper/
+└── docs/
+```
 
 ---
 
-## Environment Variables
+#  Quick Start
 
-### `backend/.env`
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `PORT` | No | Port for the Express server, defaults to `5000` |
-| `MONGODB_URI` | Yes | MongoDB connection string used by the backend |
-| `NODE_ENV` | No | Server environment, defaults to `development` |
-
-### `scraper/.env`
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `MONGO_URI` or `MONGODB_URI` | Yes | MongoDB connection string used by the scraper |
-| `RSS_FEEDS` | No | Optional override for the feed list |
-
-### `frontend/.env.local`
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `NEXT_PUBLIC_API_URL` | Yes | Base URL of the backend API, for example `https://your-api-domain/api` |
-
----
-
-## Setup Instructions
-
-Set up the backend, frontend, and scraper with the following commands.
+<details>
+<summary>Run locally</summary>
 
 ```bash
 git clone https://github.com/Samonline1/news-pulse.git
 cd news-pulse
 
-# Backend
 cd backend
 npm install
 
-# Frontend
 cd ../frontend
 npm install
 
-# Scraper
 cd ../scraper
 pip install -r requirements.txt
 ```
 
-Then run each service separately:
+Run services:
 
 ```bash
 # Backend
@@ -393,60 +168,78 @@ npm run dev
 cd frontend
 npm run dev
 
-# Scraper for a one-off ingestion
+# Scraper
 cd scraper
 python3 main.py
 ```
 
-By default:
-
-- Frontend: `http://localhost:3000`
-- Backend health check: `http://localhost:5000/health`
+</details>
 
 ---
 
-## Deployment Notes
-
-- Frontend is hosted on Vercel at `https://news-pulsei.vercel.app/`
-- Backend should be deployed separately and referenced through `NEXT_PUBLIC_API_URL`
-- The scraper uses the same MongoDB database as the backend
-- Refreshing news in production requires Python and the scraper dependencies to be available where the backend runs
-
----
-
-## Scripts
+#  Environment Variables
 
 ### Backend
 
-| Script | Command | Description |
-|---|---|---|
-| `start` | `node src/server.js` | Runs the server |
-| `dev` | `node src/server.js` | Same as start unless you add a watcher |
+```env
+PORT=
+MONGODB_URI=
+NODE_ENV=
+GROQ_API_KEY=
+```
 
 ### Frontend
 
-| Script | Command | Description |
-|---|---|---|
-| `dev` | `next dev` | Starts the development server |
-| `build` | `next build` | Builds the app |
-| `start` | `next start` | Runs the production build |
-| `lint` | `next lint` | Lints the frontend |
+```env
+NEXT_PUBLIC_API_URL=
+```
+
+### Scraper
+
+```env
+MONGODB_URI=
+RSS_FEEDS=
+```
 
 ---
 
-## Future Improvements
+#  API Overview
 
-- Add scheduled scraping runs 
-- Add authentication for ingestion endpoints
-- Improve clustering with embedding-based similarity
-- Add pagination for large timelines and cluster lists
-- Persist scraper logs and run history in MongoDB
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /health | Health check |
+| GET | /api/clusters | All clusters |
+| GET | /api/clusters/:id | Cluster details |
+| GET | /api/timeline | Timeline |
+| POST | /api/ingest/trigger | Trigger ingestion |
 
-## Limitations
+---
 
-- Keyword-based clustering can miss articles that describe the same event with different vocabulary.
-- Cluster labels are generated from keywords and may not always be human-friendly.
+#  Deployment
+
+- Frontend → Vercel
+- Backend → Render
+- Database → MongoDB Atlas
+
+---
+
+#  Roadmap
+
+- React Query caching
+- Authentication for ingestion endpoints
+- Pagination
+- Trending analytics
+- GitHub Actions scheduled scraping
+
+---
+
+#  Limitations
+
+- Semantic clustering depends on embedding quality and similarity thresholds.
+- AI-generated titles and summaries may occasionally be inaccurate.
+- Reuters RSS may be unavailable because of upstream feed issues.
 - Free-tier hosting can introduce cold starts.
 - Automatic scheduled scraping is limited on free hosting.
 
 This approach is intentionally lightweight and practical, but these limitations should be kept in mind when interpreting cluster results.
+
