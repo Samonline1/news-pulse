@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { Search, Bell, RefreshCw, ArrowUpRight, Rss } from "lucide-react";
-import { useNewsData } from "@/components/NewsDataProvider";
+// import { useNewsData } from "@/components/NewsDataProvider";
 import { ThemeToggle } from "./theme-toggle";
 
 export function Header() {
-  const { refreshNews, refreshing } = useNewsData();
+  // const { refreshNews, refreshing } = useNewsData();
 
   return (
     <header className="px-4 pt-6">

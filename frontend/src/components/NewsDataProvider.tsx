@@ -9,8 +9,8 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import axios from "axios";
-import { fetchClusters, fetchTimeline, triggerNewsRefresh } from "@/services/api";
+// import axios from "axios";
+// import { fetchClusters, fetchTimeline, triggerNewsRefresh } from "@/services/api";
 import type { ClusterSummary } from "@/types/cluster";
 
 type ToastType = "success" | "error";
@@ -22,48 +22,48 @@ interface ToastState {
 }
 
 interface NewsDataContextValue {
-  clusters: ClusterSummary[];
-  timeline: ClusterSummary[];
-  clustersLoading: boolean;
-  timelineLoading: boolean;
-  clustersError: string | null;
-  timelineError: string | null;
-  refreshNews: () => Promise<void>;
-  refreshing: boolean;
+  // clusters: ClusterSummary[];
+  // timeline: ClusterSummary[];
+  // clustersLoading: boolean;
+  // timelineLoading: boolean;
+  // clustersError: string | null;
+  // timelineError: string | null;
+  // refreshNews: () => Promise<void>;
+  // refreshing: boolean;
   toast: ToastState | null;
 }
 
 const NewsDataContext = createContext<NewsDataContextValue | null>(null);
 
 // Snapshot
-function getClusterSnapshot(clusters: ClusterSummary[]) {
-  const latestTimestamp = clusters.reduce((latest, cluster) => {
-    const candidate = Math.max(
-      new Date(cluster.endTime ?? 0).getTime(),
-      new Date(cluster.startTime ?? 0).getTime()
-    );
-    return Math.max(latest, candidate);
-  }, 0);
+// function getClusterSnapshot(clusters: ClusterSummary[]) {
+//   const latestTimestamp = clusters.reduce((latest, cluster) => {
+//     const candidate = Math.max(
+//       new Date(cluster.endTime ?? 0).getTime(),
+//       new Date(cluster.startTime ?? 0).getTime()
+//     );
+//     return Math.max(latest, candidate);
+//   }, 0);
 
-  return `${clusters.length}:${latestTimestamp}`;
-}
+//   return `${clusters.length}:${latestTimestamp}`;
+// }
 
-// Delay
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
+// // Delay
+// function sleep(ms: number) {
+//   return new Promise((resolve) => {
+//     window.setTimeout(resolve, ms);
+//   });
+// }
 
 // Provider
 export function NewsDataProvider({ children }: { children: ReactNode }) {
-  const [clusters, setClusters] = useState<ClusterSummary[]>([]);
-  const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
-  const [clustersLoading, setClustersLoading] = useState(true);
-  const [timelineLoading, setTimelineLoading] = useState(true);
-  const [clustersError, setClustersError] = useState<string | null>(null);
-  const [timelineError, setTimelineError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
+  // const [clusters, setClusters] = useState<ClusterSummary[]>([]);
+  // const [timeline, setTimeline] = useState<ClusterSummary[]>([]);
+  // const [clustersLoading, setClustersLoading] = useState(true);
+  // const [timelineLoading, setTimelineLoading] = useState(true);
+  // const [clustersError, setClustersError] = useState<string | null>(null);
+  // const [timelineError, setTimelineError] = useState<string | null>(null);
+  // const [refreshing, setRefreshing] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
 
   // Toast
@@ -77,142 +77,142 @@ export function NewsDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Clusters
-  const loadClusters = useCallback(async () => {
-    try {
-      setClustersLoading(true);
-      setClustersError(null);
-      const response = await fetchClusters();
-      setClusters(response.data || []);
-    } catch {
-      setClustersError("Failed to load clusters. Please try again.");
-    } finally {
-      setClustersLoading(false);
-    }
-  }, []);
+  // const loadClusters = useCallback(async () => {
+  //   try {
+  //     setClustersLoading(true);
+  //     setClustersError(null);
+  //     const response = await fetchClusters();
+  //     setClusters(response.data || []);
+  //   } catch {
+  //     setClustersError("Failed to load clusters. Please try again.");
+  //   } finally {
+  //     setClustersLoading(false);
+  //   }
+  // }, []);
 
   // Timeline
-  const loadTimeline = useCallback(async () => {
-    try {
-      setTimelineLoading(true);
-      setTimelineError(null);
-      const response = await fetchTimeline();
-      setTimeline(response.data || []);
-    } catch {
-      setTimelineError("Failed to load the timeline. Please try again.");
-    } finally {
-      setTimelineLoading(false);
-    }
-  }, []);
+  // const loadTimeline = useCallback(async () => {
+  //   try {
+  //     setTimelineLoading(true);
+  //     setTimelineError(null);
+  //     const response = await fetchTimeline();
+  //     setTimeline(response.data || []);
+  //   } catch {
+  //     setTimelineError("Failed to load the timeline. Please try again.");
+  //   } finally {
+  //     setTimelineLoading(false);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    void loadClusters();
-    void loadTimeline();
-  }, [loadClusters, loadTimeline]);
+  // useEffect(() => {
+  //   void loadClusters();
+  //   void loadTimeline();
+  // }, [loadClusters, loadTimeline]);
 
   // Refresh
-  const refreshNews = useCallback(async () => {
-    if (refreshing) {
-      return;
-    }
+  // const refreshNews = useCallback(async () => {
+  //   if (refreshing) {
+  //     return;
+  //   }
 
-    setRefreshing(true);
+  //   setRefreshing(true);
 
-    try {
-      const baselineSnapshot = getClusterSnapshot(clusters);
-      const response = await triggerNewsRefresh();
-      showToast(response.message || "News ingestion started.", "success");
+  //   try {
+  //     const baselineSnapshot = getClusterSnapshot(clusters);
+  //     const response = await triggerNewsRefresh();
+  //     showToast(response.message || "News ingestion started.", "success");
 
-      const timeoutAt = Date.now() + 60_000;
-      let hasChanged = false;
+  //     const timeoutAt = Date.now() + 60_000;
+  //     let hasChanged = false;
 
-      while (Date.now() < timeoutAt) {
-        await sleep(5_000);
+  //     while (Date.now() < timeoutAt) {
+  //       await sleep(5_000);
 
-        try {
-          const latest = await fetchClusters();
-          const nextSnapshot = getClusterSnapshot(latest.data || []);
+  //       try {
+  //         const latest = await fetchClusters();
+  //         const nextSnapshot = getClusterSnapshot(latest.data || []);
 
-          if (nextSnapshot !== baselineSnapshot) {
-            hasChanged = true;
-            await Promise.all([loadClusters(), loadTimeline()]);
-            window.dispatchEvent(new Event("news-data-refresh"));
-            showToast("News updated successfully.", "success");
-            break;
-          }
-        } catch (pollError) {
-          console.error("Polling clusters failed:", pollError);
-        }
-      }
+  //         if (nextSnapshot !== baselineSnapshot) {
+  //           hasChanged = true;
+  //           await Promise.all([loadClusters(), loadTimeline()]);
+  //           window.dispatchEvent(new Event("news-data-refresh"));
+  //           showToast("News updated successfully.", "success");
+  //           break;
+  //         }
+  //       } catch (pollError) {
+  //         console.error("Polling clusters failed:", pollError);
+  //       }
+  //     }
 
-      if (!hasChanged) {
-        window.dispatchEvent(new Event("news-data-refresh"));
-      }
-    } catch (requestError) {
-      const fallbackMessage = "Failed to refresh news. Please try again.";
-      let message = fallbackMessage;
+  //     if (!hasChanged) {
+  //       window.dispatchEvent(new Event("news-data-refresh"));
+  //     }
+  //   } catch (requestError) {
+  //     const fallbackMessage = "Failed to refresh news. Please try again.";
+  //     let message = fallbackMessage;
 
-      if (axios.isAxiosError(requestError)) {
-        const responseMessage =
-          (requestError.response?.data as { message?: string; details?: string } | undefined)
-            ?.details ||
-          (requestError.response?.data as { message?: string } | undefined)?.message;
+  //     if (axios.isAxiosError(requestError)) {
+  //       const responseMessage =
+  //         (requestError.response?.data as { message?: string; details?: string } | undefined)
+  //           ?.details ||
+  //         (requestError.response?.data as { message?: string } | undefined)?.message;
 
-        if (responseMessage) {
-          message = responseMessage;
-        }
-      }
+  //       if (responseMessage) {
+  //         message = responseMessage;
+  //       }
+  //     }
 
-      console.error("Refresh News failed:", requestError);
-      showToast(message, "error");
-    } finally {
-      setRefreshing(false);
-    }
-  }, [clusters, loadClusters, loadTimeline, refreshing, showToast]);
+  //     console.error("Refresh News failed:", requestError);
+  //     showToast(message, "error");
+  //   } finally {
+  //     setRefreshing(false);
+  //   }
+  // }, [clusters, loadClusters, loadTimeline, refreshing, showToast]);
 
   // Context
-  const value = useMemo<NewsDataContextValue>(
-    () => ({
-      clusters,
-      timeline,
-      clustersLoading,
-      timelineLoading,
-      clustersError,
-      timelineError,
-      refreshNews,
-      refreshing,
-      toast,
-    }),
-    [
-      clusters,
-      timeline,
-      clustersLoading,
-      timelineLoading,
-      clustersError,
-      timelineError,
-      refreshNews,
-      refreshing,
-      toast,
-    ]
-  );
+  // const value = useMemo<NewsDataContextValue>(
+  //   () => ({
+  //     clusters,
+  //     timeline,
+  //     clustersLoading,
+  //     timelineLoading,
+  //     clustersError,
+  //     timelineError,
+  //     refreshNews,
+  //     refreshing,
+  //     toast,
+  //   }),
+  //   [
+  //     clusters,
+  //     timeline,
+  //     clustersLoading,
+  //     timelineLoading,
+  //     clustersError,
+  //     timelineError,
+  //     refreshNews,
+  //     refreshing,
+  //     toast,
+  //   ]
+  // );
 
-  return (
-    <NewsDataContext.Provider value={value}>
-      {children}
-      {toast ? <ToastBanner toast={toast} /> : null}
-    </NewsDataContext.Provider>
-  );
-}
+//   return (
+//     <NewsDataContext.Provider value={value}>
+//       {children}
+//       {toast ? <ToastBanner toast={toast} /> : null}
+//     </NewsDataContext.Provider>
+//   );
+// }
 
 // Hook
-export function useNewsData() {
-  const context = useContext(NewsDataContext);
+// export function useNewsData() {
+//   const context = useContext(NewsDataContext);
 
-  if (!context) {
-    throw new Error("useNewsData must be used within a NewsDataProvider");
-  }
+//   if (!context) {
+//     throw new Error("useNewsData must be used within a NewsDataProvider");
+//   }
 
-  return context;
-}
+//   return context;
+// }
 
 // Toast UI
 function ToastBanner({ toast }: { toast: ToastState }) {
@@ -231,4 +231,5 @@ function ToastBanner({ toast }: { toast: ToastState }) {
       <p className="text-sm font-medium">{toast.message}</p>
     </div>
   );
+}
 }

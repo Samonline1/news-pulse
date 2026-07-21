@@ -1,65 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ClusterAssistantDrawer } from "@/components/ClusterAssistantDrawer";
 import { ClusterHeader } from "@/components/ClusterHeader";
-import { fetchClusterDetails } from "@/services/api";
-import type { ClusterDetails } from "@/types/cluster";
+
+// React Query
+import { useCluster } from "hooks/queries/useCluster";
 
 interface ClusterDetailsPageProps {
   clusterId: string;
 }
 
-// Details
-export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
-  const [data, setData] = useState<ClusterDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
+export function ClusterDetailsPage({
+  clusterId,
+}: ClusterDetailsPageProps) {
+  // Query
+  const {
+    data,
+    isLoading,
+    error,
+  } = useCluster(clusterId);
 
-  // Load
-  const loadCluster = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      setNotFound(false);
-
-      const response = await fetchClusterDetails(clusterId);
-      setData(response.data);
-    } catch (requestError) {
-      if (axios.isAxiosError(requestError) && requestError.response?.status === 404) {
-        setNotFound(true);
-        setData(null);
-      } else {
-        setError("Failed to load cluster details. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [clusterId]);
-
-  useEffect(() => {
-    void loadCluster();
-  }, [loadCluster]);
-
-  useEffect(() => {
-    const handleRefresh = () => {
-      void loadCluster();
-    };
-
-    window.addEventListener("news-data-refresh", handleRefresh);
-
-    return () => {
-      window.removeEventListener("news-data-refresh", handleRefresh);
-    };
-  }, [loadCluster]);
+  const cluster = data?.data;
 
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {loading ? (
+        {isLoading ? (
           <div className="space-y-6 rounded-3xl border border-white/70 bg-white/75 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
             <div className="animate-pulse rounded-3xl border border-slate-200 bg-white p-6 shadow-soft dark:border-slate-800 dark:bg-slate-950">
               <div className="space-y-4">
@@ -72,6 +39,7 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
                 </div>
               </div>
             </div>
+
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
@@ -89,40 +57,48 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
               ))}
             </div>
           </div>
-        ) : notFound ? (
-          <section className="rounded-3xl border border-white/70 bg-white/75 p-6 text-center shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
-            <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
-              <span className="text-3xl" aria-hidden="true">
-                ⌁
-              </span>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                404
-              </p>
-              <h1 className="text-2xl font-semibold tracking-tight text-ink-900 dark:text-slate-100">
-                Cluster not found
-              </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
-                The cluster you requested does not exist or is no longer available.
-              </p>
-            </div>
-          </section>
         ) : error ? (
           <section className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-6 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
             <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:text-left">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/60">
-                <span aria-hidden="true" className="text-lg">
-                  !
-                </span>
+                <span className="text-lg">!</span>
               </div>
+
               <div>
-                <p className="font-semibold">Could not load cluster details</p>
-                <p className="mt-1 text-sm text-rose-600 dark:text-rose-300/90">{error}</p>
+                <p className="font-semibold">
+                  Could not load cluster details
+                </p>
+
+                <p className="mt-1 text-sm text-rose-600 dark:text-rose-300/90">
+                  {error instanceof Error
+                    ? error.message
+                    : "Failed to load cluster details."}
+                </p>
               </div>
             </div>
           </section>
-        ) : data ? (
+        ) : !cluster ? (
+          <section className="rounded-3xl border border-white/70 bg-white/75 p-6 text-center shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
+            <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
+              <span className="text-3xl">⌁</span>
+
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                404
+              </p>
+
+              <h1 className="text-2xl font-semibold tracking-tight text-ink-900 dark:text-slate-100">
+                Cluster not found
+              </h1>
+
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                The cluster you requested does not exist or is no longer
+                available.
+              </p>
+            </div>
+          </section>
+        ) : (
           <div className="space-y-8">
-            <ClusterHeader cluster={data.cluster} />
+            <ClusterHeader cluster={cluster.cluster} />
             <ClusterAssistantDrawer clusterId={clusterId} />
 
             <section className="rounded-3xl border border-white/70 bg-white/75 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
@@ -131,22 +107,23 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
                   <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                     Articles
                   </p>
+
                   <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink-900 dark:text-slate-100">
-                    {data.articles.length} article
-                    {data.articles.length === 1 ? "" : "s"}
+                    {cluster.articles.length} article
+                    {cluster.articles.length === 1 ? "" : "s"}
                   </h2>
                 </div>
               </div>
 
-              {data.articles.length === 0 ? (
+              {cluster.articles.length === 0 ? (
                 <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
                   <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
-                    <span className="text-3xl" aria-hidden="true">
-                      ◌
-                    </span>
+                    <span className="text-3xl">◌</span>
+
                     <p className="text-base font-medium text-slate-700 dark:text-slate-200">
                       No articles available for this cluster.
                     </p>
+
                     <p className="text-sm text-slate-500 dark:text-slate-400">
                       This cluster may only contain metadata right now.
                     </p>
@@ -154,7 +131,7 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
                 </div>
               ) : (
                 <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {data.articles.map((article) => (
+                  {cluster.articles.map((article) => (
                     <ArticleCard
                       key={`${article.title}-${article.link}`}
                       article={article}
@@ -164,7 +141,7 @@ export function ClusterDetailsPage({ clusterId }: ClusterDetailsPageProps) {
               )}
             </section>
           </div>
-        ) : null}
+        )}
       </div>
     </main>
   );

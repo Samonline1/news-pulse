@@ -51,8 +51,8 @@ export async function refreshClusterSummary(clusterId: string) {
 }
 
 // Trigger
-export async function triggerNewsRefresh() {
-  return unwrapResponse<null>(refreshApi.post("/ingest/trigger"));
-}
+// export async function triggerNewsRefresh() {
+//   return unwrapResponse<null>(refreshApi.post("/ingest/trigger"));
+// }
 
 export default api;

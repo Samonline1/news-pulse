@@ -2,52 +2,61 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { fetchClusterSummary, refreshClusterSummary } from "@/services/api";
-import type { ClusterSummaryPayload } from "@/types/cluster";
+// import { fetchClusterSummary, refreshClusterSummary } from "@/services/api";
+// import type { ClusterSummaryPayload } from "@/types/cluster";
 import { formatDisplayDate } from "@/lib/formatDate";
 import { Sparkles } from "lucide-react";
+import { useSummary } from "hooks/queries/useSummary";
 interface ClusterAssistantDrawerProps {
   clusterId: string;
 }
 
-type LoadState = "idle" | "loading" | "ready" | "error";
+// type LoadState = "idle" | "loading" | "ready" | "error";
 type SummarySource = "NewsPulseAI" | "RSS";
 
 export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProps) {
   const [open, setOpen] = useState(false);
-  const [state, setState] = useState<LoadState>("idle");
-  const [summary, setSummary] = useState<ClusterSummaryPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // const [state, setState] = useState<LoadState>("idle");
+  // const [summary, setSummary] = useState<ClusterSummaryPayload | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadSummary = useCallback(async () => {
-    try {
-      setState("loading");
-      setError(null);
-      const response = await fetchClusterSummary(clusterId);
-      setSummary(response.data);
-      setState("ready");
-    } catch (requestError) {
-      setState("error");
-      if (axios.isAxiosError(requestError)) {
-        const message =
-          (requestError.response?.data as { message?: string; details?: string } | undefined)
-            ?.details ||
-          (requestError.response?.data as { message?: string } | undefined)?.message;
-        setError(message || "Unable to load summary.");
-      } else {
-        setError("Unable to load summary.");
-      }
-    }
-  }, [clusterId]);
+  const {
+  data,
+  isLoading,
+  error,
+} = useSummary(clusterId);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
+const summary = data?.data;
 
-    void loadSummary();
-  }, [loadSummary, open]);
+  // const loadSummary = useCallback(async () => {
+  //   try {
+  //     setState("loading");
+  //     setError(null);
+  //     const response = await fetchClusterSummary(clusterId);
+  //     setSummary(response.data);
+  //     setState("ready");
+  //   } catch (requestError) {
+  //     setState("error");
+  //     if (axios.isAxiosError(requestError)) {
+  //       const message =
+  //         (requestError.response?.data as { message?: string; details?: string } | undefined)
+  //           ?.details ||
+  //         (requestError.response?.data as { message?: string } | undefined)?.message;
+  //       setError(message || "Unable to load summary.");
+  //     } else {
+  //       setError("Unable to load summary.");
+  //     }
+  //   }
+  // }, [clusterId]);
+
+  // useEffect(() => {
+  //   if (!open) {
+  //     return;
+  //   }
+
+  //   void loadSummary();
+  // }, [loadSummary, open]);
 
   useEffect(() => {
     if (!open) {
@@ -85,21 +94,21 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
 
     try {
       setRefreshing(true);
-      setError(null);
-      setState("loading");
+      // setError(null);
+      // setState("loading");
       const response = await refreshClusterSummary(clusterId);
-      setSummary(response.data);
-      setState("ready");
+      // setSummary(response.data);
+      // setState("ready");
     } catch (requestError) {
-      setState("error");
+      // setState("error");
       if (axios.isAxiosError(requestError)) {
         const message =
           (requestError.response?.data as { message?: string; details?: string } | undefined)
             ?.details ||
           (requestError.response?.data as { message?: string } | undefined)?.message;
-        setError(message || "Unable to load summary.");
+        // setError(message || "Unable to load summary.");
       } else {
-        setError("Unable to load summary.");
+        // setError("Unable to load summary.");
       }
     } finally {
       setRefreshing(false);
@@ -157,13 +166,13 @@ export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProp
             </div>
 
             <div className="flex-1 overflow-hidden px-5 py-4 sm:px-6 sm:py-5">
-              {state === "loading" ? (
+              {isLoading ? (
                 <ModalSkeleton />
               ) : error ? (
                 <div className="flex min-h-[280px] flex-col justify-between gap-4">
                   <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-5 text-rose-700">
                     <p className="text-base font-semibold">Unable to load summary.</p>
-                    <p className="mt-1 text-sm text-rose-600">{error}</p>
+                    <p className="mt-1 text-sm text-rose-600">{error instanceof Error ? error.message : "Unable to load summary"}</p>
                   </div>
 
                   <div className="flex justify-end">

@@ -2,10 +2,17 @@
 
 import { useMemo } from "react";
 import { TimelineItem } from "@/components/TimelineItem";
-import { useNewsData } from "@/components/NewsDataProvider";
+import { useTimeline } from "hooks/queries/useClusters";
 
 export function Timeline() {
-  const { timeline, timelineLoading, timelineError } = useNewsData();
+  // const { timeline, timelineLoading, timelineError } = useNewsData();
+   const {
+      data,
+      isLoading,
+      error,
+    } = useTimeline();
+
+    const timeline = data?.data ?? [];
 
   const sortedTimeline = useMemo(() => {
     return [...timeline].sort((a, b) => {
@@ -30,7 +37,7 @@ export function Timeline() {
           </p>
         </div>
 
-        {timelineLoading ? (
+        {isLoading ? (
           <div className="mt-8 space-y-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <div
@@ -54,7 +61,7 @@ export function Timeline() {
               </div>
             ))}
           </div>
-        ) : timelineError ? (
+        ) : error ? (
           <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-6 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
             <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:text-left">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/60">
@@ -65,7 +72,7 @@ export function Timeline() {
               <div>
                 <p className="font-semibold">Could not load timeline</p>
                 <p className="mt-1 text-sm text-rose-600 dark:text-rose-300/90">
-                  {timelineError}
+                  {error instanceof Error ? error.message : "Something went wrong"}
                 </p>
               </div>
             </div>
