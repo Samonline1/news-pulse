@@ -1,90 +1,88 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Bell, RefreshCw, ArrowUpRight, Rss } from "lucide-react";
-import { useNewsData } from "@/components/NewsDataProvider";
+import { Menu, X, Rss } from "lucide-react";
+import { useState } from "react";
+
 import { ThemeToggle } from "./theme-toggle";
 
 export function Header() {
-  const { refreshNews, refreshing } = useNewsData();
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="px-4 pt-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between lg:px-6 py-4">
-
         {/* Left */}
-        <div
-          className="group inline-flex items-center gap-3 rounded-full  px-4 py-2 font-semibold text-slate-900  dark:border-slate-700  dark:text-slate-100">
-          {/* <p className="text-xs text-slate-500">Welcome,</p> */}
-
+        <div className="group inline-flex items-center gap-3 rounded-full  px-4 py-2 font-semibold text-slate-900  dark:border-slate-700  dark:text-slate-100">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition-transform duration-300 group-hover:hover:scale-110 dark:bg-slate-100 dark:text-slate-900">
             <Rss className="h-5 w-5" />
-
           </span>
 
-          <p className="text-xl hidden lg:block text-slate-300 dark:text-slate-600">|</p>
+          <p className="text-xl hidden lg:block text-slate-300 dark:text-slate-600">
+            |
+          </p>
 
-          <h2 className="text-xl hidden lg:block font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
             News Pulse
-
           </h2>
-
         </div>
-
-        {/* Search */}
-        {/* <div className="mx-8 hidden max-w-xl flex-1 md:block">
-          <div className="flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 transition focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-sky-400">
-
-            <Search className="mr-3 h-4 w-4 text-slate-400" />
-
-            <input
-              type="text"
-              placeholder="Search news title, source, or cluster..."
-              className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-            />
-
-          </div>
-        </div>  */}
 
         {/* Right */}
         <div className="flex items-center gap-3">
-
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-
+            className=" hidden lg:block group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+          >
             Dashboard
           </Link>
 
           <Link
             href="/timeline"
-            className="group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-
+            className=" hidden lg:block group inline-flex items-center gap-3 rounded-full border-2 border-slate-200 bg-white px-4 py-2 font-semibold text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+          >
             Timeline
           </Link>
 
-          {/* <button
-            onClick={() => void refreshNews()}
-            disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-60"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${
-                refreshing ? "animate-spin" : ""
-              }`}
-            />
-
-            {refreshing ? "Refreshing..." : "Refresh News"}
-          </button> */}
-
-
-
-
           <ThemeToggle />
-
-
+          <button
+            onClick={() => setOpen(true)}
+            className="md:hidden flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
         </div>
       </div>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-[90%] max-w-sm rounded-3xl bg-white p-6 shadow-xl dark:bg-slate-900">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Menu</h2>
+
+              <button onClick={() => setOpen(false)}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl p-3 border "
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                href="/timeline"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl p-3 border"
+              >
+                Timeline
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

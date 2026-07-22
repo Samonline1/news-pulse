@@ -1,4 +1,4 @@
-# 📰 NewsPulse AI
+# NewsPulse AI
 
 > **AI-powered news intelligence platform** that aggregates news from multiple publishers, groups related stories using semantic embeddings, and generates AI-powered titles and summaries for faster news discovery.
 
@@ -19,7 +19,7 @@
 
 #  Demo
 
-## 🎥 Demo
+## Demo
 
 <p align="center">
   <img src="/assets/demo.gif" alt="NewsPulse AI Demo" width="900"/>
