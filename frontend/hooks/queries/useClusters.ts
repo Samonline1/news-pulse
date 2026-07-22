@@ -6,7 +6,6 @@ export function useClusters() {
         queryKey: ["clusters"],
         queryFn: fetchClusters,
 
-        staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 10,
+    
     })
 }

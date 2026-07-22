@@ -15,6 +15,7 @@ export function ClusterHeader({ cluster }: ClusterHeaderProps) {
 
   return (
     <section className="rounded-3xl border border-white/70 bg-white/75 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
+      
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

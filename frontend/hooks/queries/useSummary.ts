@@ -6,7 +6,6 @@ export function useSummary(clusterId: string) {
     queryKey: ["summary", clusterId],
     queryFn: () => fetchClusterSummary(clusterId),
     enabled: !!clusterId,
-    staleTime: 1000 * 60 * 30,
-    gcTime: 1000 * 60 * 60,
+   
   });
 }

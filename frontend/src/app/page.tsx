@@ -2,13 +2,11 @@
 
 import { Header } from "@/components/Header";
 import { ClusterCard } from "@/components/ClusterCard";
-// import { useNewsData } from "@/components/NewsDataProvider";
 import { useState } from "react";
 import { LocalTime } from "@/components/WorldClock";
 import { useClusters } from "hooks/queries/useClusters";
 
 export default function HomePage() {
-  // const { clusters, clustersLoading, clustersError } = useNewsData();
   const {
     data,
     isLoading,
@@ -47,7 +45,7 @@ const clusters = data?.data ?? [];
     <main className="min-h-screen">
       <Header />
 
-      <section className="mx-auto max-w-7xl py-8 sm:px-6 lg:px-5 space-y-5 ">
+      <section className="mx-auto max-w-7xl py-8 px-4 sm:px-6 lg:px-5 space-y-5 ">
         <div className="rounded-3xl border border-slate-200 bg-slate-300/40 p-6 dark:border-slate-800 dark:bg-slate-950/80 sm:px-8">
 
           <div>

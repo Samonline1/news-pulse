@@ -7,11 +7,6 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// Refresh
-const refreshApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 180000,
-});
 
 // Envelope
 type ApiEnvelope<T> = {
@@ -28,31 +23,37 @@ async function unwrapResponse<T>(request: Promise<{ data: ApiEnvelope<T> }>) {
 
 // Clusters
 export async function fetchClusters() {
+    console.log("API: fetchClusters");
+
   return unwrapResponse<ClusterSummary[]>(api.get("/clusters"));
 }
 
 // Timeline
 export async function fetchTimeline() {
+    console.log("API: fetchTimeline");
+
   return unwrapResponse<ClusterSummary[]>(api.get("/timeline"));
 }
 
 // Details
 export async function fetchClusterDetails(clusterId: string) {
+    console.log("API: fetchClusterDetails");
+
   return unwrapResponse<ClusterDetails>(api.get(`/clusters/${clusterId}`));
 }
 
 // Summary
 export async function fetchClusterSummary(clusterId: string) {
+      console.log("API: fetchClusterSummary");
+
   return unwrapResponse<ClusterSummaryPayload>(api.get(`/clusters/${clusterId}/summary`));
 }
 
 export async function refreshClusterSummary(clusterId: string) {
+        console.log("API: refreshClusterSummary");
+
   return unwrapResponse<ClusterSummaryPayload>(api.post(`/clusters/${clusterId}/summary/refresh`));
 }
 
-// Trigger
-// export async function triggerNewsRefresh() {
-//   return unwrapResponse<null>(refreshApi.post("/ingest/trigger"));
-// }
 
 export default api;

@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-// import { fetchClusterSummary, refreshClusterSummary } from "@/services/api";
-// import type { ClusterSummaryPayload } from "@/types/cluster";
 import { formatDisplayDate } from "@/lib/formatDate";
 import { Sparkles } from "lucide-react";
 import { useSummary } from "hooks/queries/useSummary";
@@ -11,25 +9,22 @@ interface ClusterAssistantDrawerProps {
   clusterId: string;
 }
 
-// type LoadState = "idle" | "loading" | "ready" | "error";
 type SummarySource = "NewsPulseAI" | "RSS";
 
 export function ClusterAssistantDrawer({ clusterId }: ClusterAssistantDrawerProps) {
   const [open, setOpen] = useState(false);
-  // const [state, setState] = useState<LoadState>("idle");
-  // const [summary, setSummary] = useState<ClusterSummaryPayload | null>(null);
-  // const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const {
   data,
   isLoading,
   error,
+  refetch
 } = useSummary(clusterId);
 
 const summary = data?.data;
 
-  // const loadSummary = useCallback(async () => {
+
   //   try {
   //     setState("loading");
   //     setError(null);
@@ -94,21 +89,13 @@ const summary = data?.data;
 
     try {
       setRefreshing(true);
-      // setError(null);
-      // setState("loading");
-      const response = await refreshClusterSummary(clusterId);
-      // setSummary(response.data);
-      // setState("ready");
     } catch (requestError) {
-      // setState("error");
       if (axios.isAxiosError(requestError)) {
         const message =
           (requestError.response?.data as { message?: string; details?: string } | undefined)
             ?.details ||
           (requestError.response?.data as { message?: string } | undefined)?.message;
-        // setError(message || "Unable to load summary.");
       } else {
-        // setError("Unable to load summary.");
       }
     } finally {
       setRefreshing(false);
@@ -178,7 +165,7 @@ const summary = data?.data;
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => void loadSummary()}
+                      onClick={() => void refetch()}
                       className="inline-flex items-center justify-center rounded-2xl bg-ink-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-700 focus:ring-offset-2"
                     >
                       Retry

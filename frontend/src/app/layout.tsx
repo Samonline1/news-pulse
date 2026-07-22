@@ -1,5 +1,4 @@
 import "./globals.css";
-// import { NewsDataProvider } from "@/components/NewsDataProvider";
 import type { Metadata, Viewport } from "next";
 import { Provider } from "@/components/theme-provider";
 import { QueryProvider } from "providers/QueryProvider";

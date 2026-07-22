@@ -2,10 +2,9 @@
 
 import { useMemo } from "react";
 import { TimelineItem } from "@/components/TimelineItem";
-import { useTimeline } from "hooks/queries/useClusters";
+import { useTimeline } from "hooks/queries/useTimeline";
 
 export function Timeline() {
-  // const { timeline, timelineLoading, timelineError } = useNewsData();
    const {
       data,
       isLoading,
