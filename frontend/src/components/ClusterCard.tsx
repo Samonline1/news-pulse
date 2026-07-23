@@ -3,21 +3,25 @@ import type { ClusterSummary } from "@/types/cluster";
 import { ArrowUpRight } from "lucide-react";
 
 import { formatDisplayDate, formatDisplayTime } from "@/lib/formatDate";
+import { ClusterAssistantDrawer } from "./ClusterAssistantDrawer";
 
 interface ClusterCardProps {
   cluster: ClusterSummary;
 }
 
 export function ClusterCard({ cluster }: ClusterCardProps) {
+
+  
   return (
     <article className="group flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
       <div className="flex items-center justify-between">
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300">
-          Topic
+          {formatDisplayTime(cluster.endTime)}
         </span>
 
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-sky-500/10 dark:text-sky-300">
-          {formatDisplayTime(cluster.endTime)}
+          <ClusterAssistantDrawer clusterId={cluster.clusterId} showTrigger={false}/>
+
         </span>
       </div>
 
@@ -50,6 +54,7 @@ export function ClusterCard({ cluster }: ClusterCardProps) {
             }}
           />
         </div>
+        
 
         <div className="mt-3 flex items-center justify-between">
           <span className="text-sm text-slate-500 dark:text-slate-400">

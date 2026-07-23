@@ -16,7 +16,7 @@ export default function HomePage() {
   const [sortBy, setSortBy] = useState("latest");
   const [searchQuery, setSearchQuery] = useState("");
 
-const clusters = data?.data ?? [];
+  const clusters = data?.data ?? [];
 
   const filteredClusters = clusters.filter((cluster) =>
     JSON.stringify(cluster)
@@ -144,8 +144,8 @@ const clusters = data?.data ?? [];
                 <button
                   onClick={() => setSortBy("latest")}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${sortBy === "latest"
-                      ? "border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                      : "border-transparent text-slate-600 dark:text-slate-400"
+                    ? "border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                    : "border-transparent text-slate-600 dark:text-slate-400"
                     }`}
                 >
                   Latest
@@ -154,8 +154,8 @@ const clusters = data?.data ?? [];
                 <button
                   onClick={() => setSortBy("articles")}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${sortBy === "articles"
-                      ? "border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                      : "border-transparent text-slate-600 dark:text-slate-400"
+                    ? "border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                    : "border-transparent text-slate-600 dark:text-slate-400"
                     }`}
                 >
                   Most Articles
@@ -168,7 +168,7 @@ const clusters = data?.data ?? [];
           </div>
 
           {isLoading ? (
-            <div  className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={index}
@@ -189,9 +189,9 @@ const clusters = data?.data ?? [];
                 Could not load clusters
               </h3>
 
-             <p className="mt-2 text-sm text-rose-600 dark:text-rose-300/90">
-  {error instanceof Error ? error.message : "Something went wrong"}
-</p>
+              <p className="mt-2 text-sm text-rose-600 dark:text-rose-300/90">
+                {error instanceof Error ? error.message : "Something went wrong"}
+              </p>
             </div>
           ) : clusters.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center dark:border-slate-700 dark:bg-slate-900/40">
